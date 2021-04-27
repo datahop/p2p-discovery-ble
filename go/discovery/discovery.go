@@ -1,4 +1,4 @@
-package blediscovery
+package discovery
 
 import (
 	"context"
