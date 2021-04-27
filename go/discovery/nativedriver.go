@@ -1,4 +1,4 @@
-package blebridge
+package discovery
 
 type NativeDriver interface {
 	// Start the native driver
