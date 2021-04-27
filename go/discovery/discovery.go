@@ -45,7 +45,7 @@ type bleDiscoveryService struct {
 	tag     string
 	driver   NativeDriver
 	lk       sync.Mutex
-	notifees []Notifee
+	notifees []Notifees
 	interval time.Duration
 }
 
