@@ -1,4 +1,4 @@
-package androidblediscovery
+package discovery
 
 import (
 	"github.com/srene/p2p-service-ble/go/discovery"
