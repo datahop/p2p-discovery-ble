@@ -1,8 +1,8 @@
 package discovery
 
-/*import (
-	proximity "berty.tech/berty/v2/go/internal/proximitytransport"
-)*/
+import (
+	"github.com/srene/p2p-service-ble/go/discovery"
+)
 
 type NativeNBDriver interface {
 	NativeDriver
