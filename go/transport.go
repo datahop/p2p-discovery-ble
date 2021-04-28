@@ -1,9 +1,11 @@
-package blebridge
+package discovery
 
 import (
 	"context"
 	host "github.com/libp2p/go-libp2p-core/host"
-//	"github.com/libp2p/go-libp2p-core/peer"
+	//"github.com/libp2p/go-libp2p-core/peer"
+
+	//	"github.com/libp2p/go-libp2p-core/peer"
 	tptu "github.com/libp2p/go-libp2p-transport-upgrader"
 	"go.uber.org/zap"
 )
@@ -49,11 +51,12 @@ func NewTransport(ctx context.Context, l *zap.Logger, driver NativeDriver) func(
 // Adds the peer in the PeerStore and initiates a connection with it
 func (t *transport) HandleFoundPeer(sRemotePID string) bool {
 	t.logger.Debug("HandleFoundPeer", zap.String("remotePID", sRemotePID))
-	//remotePID, err := peer.Decode(sRemotePID)
+	/*remotePID, err := peer.Decode(sRemotePID)
 	if err != nil {
 		t.logger.Error("HandleFoundPeer: wrong remote peerID")
 		return false
-	}
+	}*/
+	return true
 }
 
 // HandleLostPeer is called by the native driver when the connection with the peer is lost.
@@ -61,10 +64,10 @@ func (t *transport) HandleFoundPeer(sRemotePID string) bool {
 func (t *transport) HandleLostPeer(sRemotePID string) {
 	t.logger.Debug("HandleLostPeer", zap.String("remotePID", sRemotePID))
 	//remotePID, err := peer.Decode(sRemotePID)
-	if err != nil {
+	/*if err != nil {
 		t.logger.Error("HandleLostPeer: wrong remote peerID")
 		return
-	}
+	}*/
 
 }
 

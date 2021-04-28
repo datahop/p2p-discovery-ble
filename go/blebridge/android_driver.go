@@ -1,11 +1,11 @@
 package blebridge
 
-/*import (
-	proximity "berty.tech/berty/v2/go/internal/proximitytransport"
-)*/
+import (
+	disc "github.com/srene/p2p-discovery-ble/go"
+)
 
-type NativeNBDriver interface {
-	NativeDriver
+type NativeDriver interface {
+	disc.NativeDriver
 }
 
 
