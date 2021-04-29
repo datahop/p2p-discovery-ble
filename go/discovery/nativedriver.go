@@ -24,7 +24,6 @@ type NativeDriver interface {
 
 	// Return the default multiaddress
 	DefaultAddr() string
-
 }
 
 type NoopNativeDriver struct {
