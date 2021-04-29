@@ -25,6 +25,10 @@ type Service interface {
 type Notifee interface {
 	HandlePeerFound(peer.AddrInfo)
 }
+type BleDiscoveryService interface {
+	HandlePeerFound(peer.AddrInfo)
+	HandleLostPeer(remotePID string)
+}
 
 type bleDiscoveryService struct {
 	//server  *mdns.Server
@@ -81,16 +85,4 @@ func (s *bleDiscoveryService) UnregisterNotifee(n Notifee) {
 	s.lk.Unlock()
 }
 
-/*func (s *bleDiscoveryService) HandlePeerFound(pi peer.AddrInfo) {
-	log.Debug("mDNS Found Peer : ", pi.ID)
-	if err := p.Host.Connect(context.Background(), pi); err != nil {
-		log.Error("Failed to connect to peer : ", pi.ID.String())
-	}
-}*/
-func  HandleFoundPeer(sRemotePID string) bool {
-	s.lk.Lock()
-	for _, n := range s.notifees {
-		go n.HandlePeerFound(nil)
-	}
-	s.lk.Unlock()
-}
+
