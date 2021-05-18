@@ -1,6 +1,6 @@
 package blediscovery
 
-import (
+/*import (
 	"io"
 	"sync"
 	"time"
@@ -83,6 +83,6 @@ func (s *bleDiscoveryService) UnregisterNotifee(n Notifee) {
 		s.notifees = append(s.notifees[:found], s.notifees[found+1:]...)
 	}
 	s.lk.Unlock()
-}
+}*/
 
 
