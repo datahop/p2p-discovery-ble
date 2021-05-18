@@ -1,4 +1,4 @@
-module github.com/srene/p2p-discovery-ble/go
+module github.com/datahop/p2p-discovery-ble/go
 
 go 1.16
 
