@@ -1,4 +1,4 @@
-package network.datahop.p2p;
+package network.datahop.blediscovery;
 
 import org.junit.Test;
 

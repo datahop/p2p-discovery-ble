@@ -1,4 +1,4 @@
-package network.datahop.p2p;
+package network.datahop.blediscovery;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("network.datahop.p2p", appContext.getPackageName());
+        assertEquals("network.datahop.blediscovery", appContext.getPackageName());
     }
 }
