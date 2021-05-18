@@ -37,10 +37,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import datahop.BleDiscNotifier;
-import datahop.BleDiscoveryDriver;
-import datahop.Datahop;
-import network.datahop.datahopdemo.net.Config;
+import blediscovery.BleDiscNotifier;
+import blediscovery.BleDiscoveryDriver;
+//import datahop.Datahop;
 
 import static android.content.Context.BLUETOOTH_SERVICE;
 import static java.lang.Thread.sleep;
@@ -114,9 +113,14 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 		return mBleDiscovery;
 	}
 
+
+	public void setNotifier(BleDiscNotifier notifier){
+		Log.d(TAG,"Trying to start");
+		this.notifier = notifier;
+	}
+
 	@Override
 	public void start(String service_uuid) {
-		notifier = Datahop.getBleDiscNotifier();
 		if (notifier == null) {
 			Log.e(TAG, "notifier not found");
 			return ;

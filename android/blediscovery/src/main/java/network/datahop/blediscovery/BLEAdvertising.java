@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import blediscovery.BleAdvNotifier;
 import blediscovery.BleAdvertisingDriver;
+import blediscovery.BleDiscNotifier;
 
 import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_MODE_BALANCED;
 import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM;
@@ -56,10 +57,13 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
         return mBleAdvertising;
     }
 
+    public void setNotifier(BleAdvNotifier notifier){
+        Log.d(TAG,"Trying to start");
+        this.notifier = notifier;
+    }
 
     public void start(String parcelUuid) {
         Log.d(TAG, "Starting ADV, Tx power " + parcelUuid.toString());
-        this.notifier = Datahop.getBleAdvNotifier();
 
         if (notifier == null) {
             Log.e(TAG, "notifier not found");

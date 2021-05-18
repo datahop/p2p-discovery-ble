@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static network.datahop.datahopdemo.net.ble.Constants.CLIENT_CONFIGURATION_DESCRIPTOR_UUID;
+import static network.datahop.blediscovery.Constants.CLIENT_CONFIGURATION_DESCRIPTOR_UUID;
 
 public class GattServerCallback extends BluetoothGattServerCallback {
 

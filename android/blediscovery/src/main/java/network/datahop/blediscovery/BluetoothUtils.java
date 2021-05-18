@@ -20,10 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static network.datahop.datahopdemo.net.ble.Constants.CHARACTERISTIC_DATAHOP_DIRECT;
-import static network.datahop.datahopdemo.net.ble.Constants.CHARACTERISTIC_DATAHOP_STRING;
-import static network.datahop.datahopdemo.net.ble.Constants.CLIENT_CONFIGURATION_DESCRIPTOR_SHORT_ID;
-
+import static network.datahop.blediscovery.Constants.CHARACTERISTIC_DATAHOP_DIRECT;
+import static network.datahop.blediscovery.Constants.CHARACTERISTIC_DATAHOP_STRING;
+import static network.datahop.blediscovery.Constants.CLIENT_CONFIGURATION_DESCRIPTOR_SHORT_ID;
 
 public class BluetoothUtils {
 
