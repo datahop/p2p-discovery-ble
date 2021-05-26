@@ -30,7 +30,7 @@ import network.datahop.blediscovery.BLEServiceDiscovery;
 public class MainActivity extends AppCompatActivity implements BleDiscNotifier, BleAdvNotifier {
 
 
-    private Button starButton,stopButton,refreshButton;
+    private Button startButton,stopButton,refreshButton;
 
     private TextView status, discovery;
     private BLEAdvertising advertisingDriver;
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements BleDiscNotifier, 
         advertisingDriver.setNotifier(this);
         discoveryDriver.setNotifier(this);
 
-        starButton = (Button) findViewById(R.id.startbutton);
+        startButton = (Button) findViewById(R.id.startbutton);
         stopButton = (Button) findViewById(R.id.stopbutton);
         refreshButton = (Button) findViewById(R.id.refreshbutton);
 
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements BleDiscNotifier, 
 
         discovery.setText("Users discovered: "+counter);
         requestForPermissions();
-        starButton.setOnClickListener(new View.OnClickListener() {
+        startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 stat = randomString();
