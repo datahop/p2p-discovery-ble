@@ -1,4 +1,4 @@
-# p2p-ble
+# Discovery service library for Android using Bluetooth Low Energy 
 
 # License
 
