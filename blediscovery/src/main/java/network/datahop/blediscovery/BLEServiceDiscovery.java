@@ -58,6 +58,7 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 	//public static final String USER_DISCOVERED = "user_discovered";
 
 	private HashMap<UUID,byte[]> advertisingInfo;
+	private HashMap<UUID,String> convertedCharacteristics;
     private boolean mScanning;
 	private Set<BluetoothDevice> results;
 
@@ -83,8 +84,9 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 
 		this.context = context;
 
-		mHandler = new Handler(Looper.getMainLooper());
-		advertisingInfo = new HashMap();
+		this.mHandler = new Handler(Looper.getMainLooper());
+		this.advertisingInfo = new HashMap<>();
+		this.convertedCharacteristics = new HashMap<>();
 		this.results = new HashSet<BluetoothDevice>();
 
     }
@@ -154,6 +156,7 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 		String inf = new String(info);
 		Log.d(TAG,"addAdvertisingInfo "+characteristic+" "+inf);
 		advertisingInfo.put(UUID.nameUUIDFromBytes(characteristic.getBytes()),info);
+		convertedCharacteristics.put(UUID.nameUUIDFromBytes(characteristic.getBytes()),characteristic);
 	}
 
 	public void startScanning(String service_uuid)
@@ -377,7 +380,7 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
         }
 		pendingWrite--;
 		if (Arrays.equals(new byte[]{0x00}, messageBytes)){
-            notifier.peerSameStatusDiscovered(device.getName(),"");
+            notifier.peerSameStatusDiscovered(device.getName(),convertedCharacteristics.get(characteristic));
             if (pendingWrite<=0)
 				disconnect();
             tryConnection();
@@ -386,9 +389,9 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
         	String msg = new String(messageBytes);
         	String[] split = msg.split(":");
         	if(split.length==3)
-				notifier.peerDifferentStatusDiscovered(device.getName(),"",split[0],split[1],split[2]);
+				notifier.peerDifferentStatusDiscovered(device.getName(),convertedCharacteristics.get(characteristic),split[0],split[1],split[2]);
         	else
-        		notifier.peerSameStatusDiscovered(device.getName(),"");
+        		notifier.peerSameStatusDiscovered(device.getName(),convertedCharacteristics.get(characteristic));
 			disconnect();
 			//started=false;
 			//close();

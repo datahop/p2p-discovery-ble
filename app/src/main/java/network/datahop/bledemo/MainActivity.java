@@ -184,16 +184,16 @@ public class MainActivity extends AppCompatActivity implements BleDiscNotifier, 
     }
 
     @Override
-    public void differentStatusDiscovered(byte[] bytes) {
+    public void differentStatusDiscovered(byte[] bytes,UUID characteristic) {
         Log.d(TAG,"differentStatusDiscovered");
-        advertisingDriver.notifyNetworkInformation("bledemo",stat,stat,stat);
+        advertisingDriver.notifyNetworkInformation(stat,stat,stat);
 
     }
 
     @Override
-    public void sameStatusDiscovered() {
+    public void sameStatusDiscovered(UUID characteristic) {
         Log.d(TAG,"sameStatusDiscovered");
-        advertisingDriver.notifyEmptyValue("bledemo");
+        advertisingDriver.notifyEmptyValue();
 
     }
 

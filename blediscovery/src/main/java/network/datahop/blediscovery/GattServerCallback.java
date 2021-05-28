@@ -128,7 +128,7 @@ public class GattServerCallback extends BluetoothGattServerCallback {
             Log.d(TAG, "Characteristic check " + characteristic.getUuid().toString() + " " + network + " " + valueString2 + " " + valueString);
             if (!valueString.equals(valueString2)) {
                 Log.d(TAG, "Connecting");
-                listener.differentStatusDiscovered(value);
+                listener.differentStatusDiscovered(value,characteristic.getUuid());
                 /*hotspot.start(new WifiDirectHotSpot.StartStopListener() {
                     public void onSuccess() {
                         Log.d(TAG, "Hotspot started");
@@ -148,7 +148,7 @@ public class GattServerCallback extends BluetoothGattServerCallback {
                 notifyCharacteristic(response, characteristic.getUuid());*/
             } else {
                 Log.d(TAG, "Not Connecting");
-                listener.sameStatusDiscovered();
+                listener.sameStatusDiscovered(value,characteristic.getUuid());
             }
 
         }

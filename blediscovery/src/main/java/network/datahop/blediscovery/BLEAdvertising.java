@@ -33,18 +33,23 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
     private GattServerCallback serverCallback;
     private BluetoothGattServer mBluetoothGattServer;
     private HashMap<UUID,byte[]> advertisingInfo;
+    private HashMap<UUID,String> convertedCharacteristics;
 
     private static volatile BLEAdvertising mBleAdvertising;
     private Context context;
 
     private static BleAdvNotifier notifier;
 
+    private List<UUID> pendingNotifications;
+
     private BLEAdvertising(Context context){
 
-        manager = (BluetoothManager) context.getSystemService(BLUETOOTH_SERVICE);
-        btAdapter = manager.getAdapter();
+        this.manager = (BluetoothManager) context.getSystemService(BLUETOOTH_SERVICE);
+        this.btAdapter = manager.getAdapter();
         this.context = context;
-        advertisingInfo = new HashMap();
+        this.advertisingInfo = new HashMap<>();
+        this.convertedCharacteristics = new HashMap<>();
+        this.pendingNotifications = new ArrayList<>();
     }
 
     // Singleton method
@@ -101,13 +106,15 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
         //stopServer();
         serverCallback = new GattServerCallback(context, parcelUuid, advertisingInfo, new DiscoveryListener() {
             @Override
-            public void sameStatusDiscovered() {
+            public void sameStatusDiscovered(UUID characteristic) {
+                pendingNotifications.add(characteristic);
                 notifier.sameStatusDiscovered();
             }
 
             @Override
-            public void differentStatusDiscovered(byte[] value) {
-                notifier.differentStatusDiscovered(value);
+            public void differentStatusDiscovered(byte[] value,UUID characteristic) {
+                pendingNotifications.add(characteristic);
+                notifier.differentStatusDiscovered(convertedCharacteristics.get(characteristic),value);
             }
         });
         mBluetoothGattServer = manager.openGattServer(context, serverCallback);
@@ -135,6 +142,7 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
                     BluetoothGattCharacteristic.PERMISSION_WRITE);
             service.addCharacteristic(writeCharacteristic);
         }*/
+
         for(UUID uuid:advertisingInfo.keySet()){
             Log.d(TAG, "Advertising characteristic " + uuid.toString());
             BluetoothGattCharacteristic writeCharacteristic = new BluetoothGattCharacteristic(
@@ -157,19 +165,21 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
     @Override
     public void addAdvertisingInfo(String characteristic, byte[] info){
         advertisingInfo.put(UUID.nameUUIDFromBytes(characteristic.getBytes()),info);
+        convertedCharacteristics.put(UUID.nameUUIDFromBytes(characteristic.getBytes()),characteristic);
     }
 
     @Override
-    public void notifyNetworkInformation(String uuid, String network, String password, String info){
-        UUID characteristic= UUID.nameUUIDFromBytes(uuid.getBytes());
+    public void notifyNetworkInformation(String network, String password, String info){
+
         String msg = network+":"+password+":"+info;
-        serverCallback.notifyCharacteristic(msg.getBytes(), characteristic);
+        for(UUID characteristic : pendingNotifications)
+            serverCallback.notifyCharacteristic(msg.getBytes(), characteristic);
     }
 
     @Override
-    public void notifyEmptyValue(String uuid){
-        UUID characteristic= UUID.nameUUIDFromBytes(uuid.getBytes());
-        serverCallback.notifyCharacteristic(new byte[]{0x00}, characteristic);
+    public void notifyEmptyValue(){
+        for(UUID characteristic : pendingNotifications)
+            serverCallback.notifyCharacteristic(new byte[]{0x00}, characteristic);
     }
 
 
