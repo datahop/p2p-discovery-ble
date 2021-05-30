@@ -16,6 +16,9 @@ import static network.datahop.blediscovery.Constants.CHARACTERISTIC_DATAHOP_DIRE
 import static network.datahop.blediscovery.Constants.CHARACTERISTIC_DATAHOP_STRING;
 import static network.datahop.blediscovery.Constants.CLIENT_CONFIGURATION_DESCRIPTOR_SHORT_ID;
 
+/**
+ * BLE characteristics util functions.
+ */
 public class BluetoothUtils {
 
     // Characteristics

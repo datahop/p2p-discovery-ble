@@ -17,8 +17,8 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
-
 import java.util.Random;
+import java.util.UUID;
 
 import datahop.BleDiscNotifier;
 import datahop.BleAdvNotifier;
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements BleDiscNotifier, 
                 advertisingDriver.addAdvertisingInfo("bledemo",stat.getBytes());
                 discoveryDriver.addAdvertisingInfo("bledemo",stat.getBytes());
                 advertisingDriver.start(TAG);
-                discoveryDriver.start(TAG);
+                discoveryDriver.start(TAG,2000,30000);
             }
         });
 
@@ -184,14 +184,14 @@ public class MainActivity extends AppCompatActivity implements BleDiscNotifier, 
     }
 
     @Override
-    public void differentStatusDiscovered(byte[] bytes,UUID characteristic) {
+    public void differentStatusDiscovered(byte[] bytes) {
         Log.d(TAG,"differentStatusDiscovered");
         advertisingDriver.notifyNetworkInformation(stat,stat,stat);
 
     }
 
     @Override
-    public void sameStatusDiscovered(UUID characteristic) {
+    public void sameStatusDiscovered() {
         Log.d(TAG,"sameStatusDiscovered");
         advertisingDriver.notifyEmptyValue();
 

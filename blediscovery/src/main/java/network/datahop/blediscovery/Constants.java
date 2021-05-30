@@ -2,8 +2,11 @@ package network.datahop.blediscovery;
 
 import java.util.UUID;
 
+/**
+ * BLE characteristics constant values
+ *
+ */
 public class Constants {
-
 
 
     public static String CLIENT_CONFIGURATION_DESCRIPTOR_STRING = "00002902-0000-1000-8000-00805f9b34fb";

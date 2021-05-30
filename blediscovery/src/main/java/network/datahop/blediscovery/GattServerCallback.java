@@ -8,7 +8,6 @@ import android.bluetooth.BluetoothGattServer;
 import android.bluetooth.BluetoothGattServerCallback;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothProfile;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.os.ParcelUuid;
 import android.util.Log;
@@ -21,6 +20,11 @@ import java.util.UUID;
 
 import static network.datahop.blediscovery.Constants.CLIENT_CONFIGURATION_DESCRIPTOR_UUID;
 
+
+/**
+ * GattServerCallback extends BluetoothGattServerCallback and overwrites all functions required to
+ * accept GATT connections and read/write characteristics.
+ */
 public class GattServerCallback extends BluetoothGattServerCallback {
 
     private BluetoothGattServer mGattServer;
@@ -28,18 +32,11 @@ public class GattServerCallback extends BluetoothGattServerCallback {
     private Map<String, byte[]> mClientConfigurations;
 
     String network, password;
-    //    WifiDirectHotSpot hotspot;
     private Context mContext;
-    //   HashMap<UUID,ContentAdvertisement> ca;
     BluetoothGattCharacteristic mCharacteristic;
-    //DataHopConnectivityService service;
     ParcelUuid mServiceUUID;
     private static final String TAG = "GattServerCallback";
-    //  StatsHandler stats;
-    //ContentDatabaseHandler db;
     private HashMap<UUID, byte[]> advertisingInfo;
-
-    BroadcastReceiver mBroadcastReceiver;
 
     DiscoveryListener listener;
 
@@ -48,9 +45,7 @@ public class GattServerCallback extends BluetoothGattServerCallback {
         mDevices = new ArrayList<>();
         mClientConfigurations = new HashMap<>();
         mContext = context;
-        //      this.hotspot = hotspot;
-        //    this.ca = ca;
-        //db = new ContentDatabaseHandler(context);
+
         network = null;
         mServiceUUID = new ParcelUuid(UUID.nameUUIDFromBytes(parcelUuid.getBytes()));
         this.advertisingInfo = advertisingInfo;
@@ -122,48 +117,20 @@ public class GattServerCallback extends BluetoothGattServerCallback {
         Log.d(TAG, "onCharacteristicWriteRequest");
         if (BluetoothUtils.matchAnyCharacteristic(characteristic.getUuid(), groups)) {
             mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null);
-            //      if(ca.get(characteristic.getUuid()).connectFilter(value)&&network!=null) {
             String valueString = new String(value);
             String valueString2 = new String(advertisingInfo.get(characteristic.getUuid()));
             Log.d(TAG, "Characteristic check " + characteristic.getUuid().toString() + " " + network + " " + valueString2 + " " + valueString);
             if (!valueString.equals(valueString2)) {
                 Log.d(TAG, "Connecting");
                 listener.differentStatusDiscovered(value,characteristic.getUuid());
-                /*hotspot.start(new WifiDirectHotSpot.StartStopListener() {
-                    public void onSuccess() {
-                        Log.d(TAG, "Hotspot started");
-                    }
 
-                    public void onFailure(int reason) {
-                        Log.d(TAG, "Hotspot started failed, error code " + reason);
-                    }
-                });
-                hotspot.startConnection();
-                mCharacteristic = characteristic;
-                Random rn = new Random();
-                int range = 254 - 2 + 1;
-                int ip =  rn.nextInt(range) + 2;
-                byte[] response = (network+":"+password+":"+Config.ip+"."+String.valueOf(ip)).getBytes();
-                characteristic.setValue(response);
-                notifyCharacteristic(response, characteristic.getUuid());*/
             } else {
                 Log.d(TAG, "Not Connecting");
-                listener.sameStatusDiscovered(value,characteristic.getUuid());
+                listener.sameStatusDiscovered(characteristic.getUuid());
             }
 
         }
-        /*if(BluetoothUtils.matchDirectConnectionCharacteristic(characteristic))
-        {
-            Log.d(TAG,"Direct connection request");
-            LocalBroadcastManager.getInstance(mContext).registerReceiver(mBroadcastReceiver,getIntentFilter());
 
-            mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null);
-            String action = DIRECT_CONNECTION;
-            Intent broadcast = new Intent(action)
-                    .putExtra("user", new String(value));
-            LocalBroadcastManager.getInstance(mContext).sendBroadcast(broadcast);
-
-        }*/
     }
 
 
@@ -228,10 +195,4 @@ public class GattServerCallback extends BluetoothGattServerCallback {
                 && (clientConfiguration[1] & notificationEnabled[1]) == notificationEnabled[1];
     }
 
-    /*public static IntentFilter getIntentFilter() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(DIRECT_CONNECTION_ACCEPTED);
-        filter.addAction(DIRECT_CONNECTION_REJECTED);
-        return filter;
-    }*/
 }

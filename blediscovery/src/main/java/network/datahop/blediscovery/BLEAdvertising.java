@@ -15,6 +15,8 @@ import android.util.Log;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
 
 import datahop.BleAdvNotifier;
 import datahop.BleAdvertisingDriver;
@@ -23,6 +25,14 @@ import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_MODE_BALANCED;
 import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM;
 import static android.content.Context.BLUETOOTH_SERVICE;
 
+/**
+ * BLEAdvertising class is used for service discovery using Bluetooth Low Energy beacons.
+ * BLEAdvertising is responsible of advertising service discovery data and exchange service status
+ * using GATT server and GATT characteristics. Advertised data for each service is structured in "topics"
+ * and each topic is configured as a BLE characteristic in the GATT server.
+ * Characteristics are compared in the GATT Server when accepting connections to compare status for each "topic.
+ * When detected different values of the "topics" means different service status and it can reply with network information.
+ */
 public class BLEAdvertising  implements BleAdvertisingDriver{
 
     private static final String TAG = BLEAdvertising.class.getSimpleName();
@@ -42,6 +52,10 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
 
     private List<UUID> pendingNotifications;
 
+    /**
+     * BLEAdvertising class constructor
+     * @param Android context
+     */
     private BLEAdvertising(Context context){
 
         this.manager = (BluetoothManager) context.getSystemService(BLUETOOTH_SERVICE);
@@ -52,22 +66,33 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
         this.pendingNotifications = new ArrayList<>();
     }
 
-    // Singleton method
+    /* Singleton method that creates and returns a BLEAdvertising instance
+     * @return BLEAdvertising instance
+     */
     public static synchronized BLEAdvertising getInstance(Context appContext) {
         if (mBleAdvertising == null) {
             mBleAdvertising = new BLEAdvertising(appContext);
-           // initDriver();
         }
         return mBleAdvertising;
     }
 
+    /**
+     * Set the notifier that receives the events advertised
+     * when creating or destroying the group or when receiving users connections
+     * @param notifier instance
+     */
     public void setNotifier(BleAdvNotifier notifier){
         Log.d(TAG,"Trying to start");
         this.notifier = notifier;
     }
 
-    public void start(String parcelUuid) {
-        Log.d(TAG, "Starting ADV, Tx power " + parcelUuid.toString());
+    /**
+     * This method configures AdvertiseSettings, starts advertising via BluetoothLeAdvertiser
+     * and starts the GATT server
+     * @param serviceid service id
+     */
+    public void start(String serviceid) {
+        Log.d(TAG, "Starting ADV, Tx power " + serviceid.toString());
 
         if (notifier == null) {
             Log.e(TAG, "notifier not found");
@@ -75,10 +100,10 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
         }
         if (btAdapter != null) {
             if (btAdapter.isMultipleAdvertisementSupported()) {
-                Log.d(TAG, "Starting ADV2, Tx power " + parcelUuid.toString());
+                Log.d(TAG, "Starting ADV2, Tx power " + serviceid.toString());
                 adv = btAdapter.getBluetoothLeAdvertiser();
                 advertiseCallback = createAdvertiseCallback();
-                ParcelUuid mServiceUUID = new ParcelUuid(UUID.nameUUIDFromBytes(parcelUuid.getBytes()));
+                ParcelUuid mServiceUUID = new ParcelUuid(UUID.nameUUIDFromBytes(serviceid.getBytes()));
 
                 AdvertiseSettings advertiseSettings = new AdvertiseSettings.Builder()
                         .setAdvertiseMode(ADVERTISE_MODE_BALANCED)
@@ -95,16 +120,16 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
                 adv.startAdvertising(advertiseSettings, advertiseData, advertiseCallback);
             }
         }
-        //Log.d(TAG, "Name length " + stats.getUserName().getBytes().length + " " + advertiseData);
-        startGATTServer(parcelUuid);
+        startGATTServer(serviceid);
     }
 
-    private void startGATTServer(String parcelUuid){
+    /**
+     * This method starts the GATT server
+     * @param serviceid service id
+     */
+    private void startGATTServer(String serviceid){
 
-//        Log.d(TAG, "Start server " + hotspot.getNetworkName());
-
-        //stopServer();
-        serverCallback = new GattServerCallback(context, parcelUuid, advertisingInfo, new DiscoveryListener() {
+        serverCallback = new GattServerCallback(context, serviceid, advertisingInfo, new DiscoveryListener() {
             @Override
             public void sameStatusDiscovered(UUID characteristic) {
                 pendingNotifications.add(characteristic);
@@ -126,22 +151,8 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
         }
 
 
-        ParcelUuid SERVICE_UUID = new ParcelUuid(UUID.nameUUIDFromBytes(parcelUuid.getBytes()));
+        ParcelUuid SERVICE_UUID = new ParcelUuid(UUID.nameUUIDFromBytes(serviceid.getBytes()));
         BluetoothGattService service = new BluetoothGattService(SERVICE_UUID.getUuid(), BluetoothGattService.SERVICE_TYPE_PRIMARY);
-
-
-        // Write characteristic
-        /*int charnum= (int)Datahop.getAdvertisingUUIDNum();
-        for (int i=0;i<charnum;i++){
-            String characteristic = Datahop.getAdvertisingUUID(i);
-            UUID CHARACTERISTIC_UUID = UUID.nameUUIDFromBytes(characteristic.getBytes());
-            Log.d(TAG, "Advertising characteristic " + CHARACTERISTIC_UUID.toString());
-            BluetoothGattCharacteristic writeCharacteristic = new BluetoothGattCharacteristic(
-                    CHARACTERISTIC_UUID,
-                    BluetoothGattCharacteristic.PROPERTY_WRITE,
-                    BluetoothGattCharacteristic.PERMISSION_WRITE);
-            service.addCharacteristic(writeCharacteristic);
-        }*/
 
         for(UUID uuid:advertisingInfo.keySet()){
             Log.d(TAG, "Advertising characteristic " + uuid.toString());
@@ -155,6 +166,9 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
 
     }
 
+    /**
+     * This method stops the advertising service
+     */
     @Override
     public void stop() {
         Log.d(TAG, "Stopping ADV");
@@ -162,12 +176,24 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
         serverCallback.stop();
     }
 
+    /**
+     * This method adds advertising information value for the specified "topic". In case "topic"
+     * already exists information is updated
+     * @param topic topic id
+     * @param info value advertised
+     */
     @Override
-    public void addAdvertisingInfo(String characteristic, byte[] info){
-        advertisingInfo.put(UUID.nameUUIDFromBytes(characteristic.getBytes()),info);
-        convertedCharacteristics.put(UUID.nameUUIDFromBytes(characteristic.getBytes()),characteristic);
+    public void addAdvertisingInfo(String topic, byte[] info){
+        advertisingInfo.put(UUID.nameUUIDFromBytes(topic.getBytes()),info);
+        convertedCharacteristics.put(UUID.nameUUIDFromBytes(topic.getBytes()),topic);
     }
 
+    /**
+     * This method can be used to notify network information (SSID, password, node info) when detected different "topic" status
+     * @param network SSID
+     * @param password
+     * @param info  other network information
+     */
     @Override
     public void notifyNetworkInformation(String network, String password, String info){
 
@@ -176,6 +202,9 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
             serverCallback.notifyCharacteristic(msg.getBytes(), characteristic);
     }
 
+    /**
+     * This method can be used to notify no different "topic" status is detected.
+     */
     @Override
     public void notifyEmptyValue(){
         for(UUID characteristic : pendingNotifications)

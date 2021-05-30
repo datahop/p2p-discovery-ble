@@ -1,13 +1,11 @@
 package network.datahop.blediscovery;
 
-
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
-import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.bluetooth.le.BluetoothLeScanner;
@@ -35,6 +33,13 @@ import datahop.BleDiscoveryDriver;
 import static android.content.Context.BLUETOOTH_SERVICE;
 import static java.lang.Thread.sleep;
 
+/**
+ * BLEServiceDiscovery class is used for service discovery using Bluetooth Low Energy (BLE) beacons.
+ * BLEServiceDiscovery is responsible of scanning for BLE Beacons and starts a connection to the GATT server
+ * when found BLE Beacons with the same service id.
+ * Characteristics are compared in the GATT Server when accepting connections to compare status for each "topic".
+ * When detected different values of the "topics" it receives network information from the server.
+ */
 public class BLEServiceDiscovery implements BleDiscoveryDriver{
 
 	private static final String TAG = "BLEServiceDiscovery";
@@ -53,17 +58,11 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 	private static final int STATE_CONNECTING = 1;
 	private static final int STATE_CONNECTED = 2;
 
-	private long btIdleFgTime = Config.bleAdvertiseForegroundDuration;
-	private long scanTime = Config.bleScanDuration;
-	//public static final String USER_DISCOVERED = "user_discovered";
-
 	private HashMap<UUID,byte[]> advertisingInfo;
 	private HashMap<UUID,String> convertedCharacteristics;
-    private boolean mScanning;
 	private Set<BluetoothDevice> results;
 
 	private boolean started=false;
-	//SettingsPreferences mTimers;
 	private static BluetoothLeScanner mLEScanner;
 
 	private boolean mInitialized = false;
@@ -77,13 +76,15 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 
 	private static BleDiscNotifier notifier;
 	private  boolean exit;
-	//public BLEServiceDiscovery(LinkListener lListener, DiscoveryListener dListener, Context context/*, SettingsPreferences timers*/, StatsHandler stats)
 
+	/**
+	 * BLEServiceDiscovery class constructor
+	 * @param Android context
+	 */
 	private BLEServiceDiscovery(Context context)
 	{
 
 		this.context = context;
-
 		this.mHandler = new Handler(Looper.getMainLooper());
 		this.advertisingInfo = new HashMap<>();
 		this.convertedCharacteristics = new HashMap<>();
@@ -91,13 +92,17 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 
     }
 
+	/* Method used to initialize Bluetooth LE Adapter
+	 */
 	private static synchronized void initDriver(){
 		mBluetoothManager = (BluetoothManager) context.getSystemService(BLUETOOTH_SERVICE);
 		mBluetoothAdapter = mBluetoothManager.getAdapter();
 		if(mBluetoothAdapter!=null)mLEScanner = mBluetoothAdapter.getBluetoothLeScanner();
 	}
 
-	// Singleton method
+	/* Singleton method that creates and returns a BLEServiceDiscovery instance
+	 * @return BLEServiceDiscovery instance
+	 */
 	public static synchronized BLEServiceDiscovery getInstance(Context appContext) {
 		if (mBleDiscovery == null) {
 			mBleDiscovery = new BLEServiceDiscovery(appContext);
@@ -106,14 +111,24 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 		return mBleDiscovery;
 	}
 
-
+	/**
+	 * Set the notifier that receives the events advertised
+	 * when creating or destroying the group or when receiving users connections
+	 * @param notifier instance
+	 */
 	public void setNotifier(BleDiscNotifier notifier){
 		Log.d(TAG,"Trying to start");
 		this.notifier = notifier;
 	}
 
+	/**
+	 * This method starts the service and periodically scans for users and tries to connect to them
+	 * @param service_uuid service id
+	 * @param scanTime duration of the scanning phase
+	 * @param idleTime idle time before starting another scan cycle
+	 */
 	@Override
-	public void start(String service_uuid) {
+	public void start(String service_uuid,long scanTime, long idleTime) {
 		if (notifier == null) {
 			Log.e(TAG, "notifier not found");
 			return ;
@@ -130,19 +145,20 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 				mHandler.postDelayed(new Runnable() {
 					@Override
 					public void run() {
-						//bleScan.tryConnection();
 						if(!exit){
 							Log.d(TAG,"Start service");
-							start(service_uuid);
+							start(service_uuid,scanTime,idleTime);
 						}
 					}
-				}, btIdleFgTime);
+				}, idleTime);
 			}
 		}, scanTime);
 	}
 
 
-
+	/**
+	 * Stops the discovery service
+	 */
 	@Override
 	public void stop()
 	{
@@ -151,6 +167,12 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 		stopScanning();
 	}
 
+	/**
+	 * This method adds advertising information value for the specified "topic". In case "topic"
+	 * already exists information is updated
+	 * @param topic topic id
+	 * @param info value advertised
+	 */
 	@Override
 	public void addAdvertisingInfo(String characteristic, byte[] info){
 		String inf = new String(info);
@@ -159,7 +181,7 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 		convertedCharacteristics.put(UUID.nameUUIDFromBytes(characteristic.getBytes()),characteristic);
 	}
 
-	public void startScanning(String service_uuid)
+	private void startScanning(String service_uuid)
 	{
 
 		Log.d(TAG,"startScanning Service uuid:"+service_uuid+" "+started);
@@ -169,7 +191,6 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 			started = true;
 			mServiceUUID =new ParcelUuid(UUID.nameUUIDFromBytes(service_uuid.getBytes()));
 			results.clear();
-			//serverstate = BluetoothProfile.STATE_DISCONNECTED;
 			mConnectionState = STATE_DISCONNECTED;
 
 			if (!mBluetoothAdapter.isEnabled()) {
@@ -194,12 +215,7 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 
 	}
 
-	public void closeConnWithPeer(String peer){
-
-	}
-
-
-	public void scanLeDevice() {
+	private void scanLeDevice() {
 
 		Log.d(TAG, "Start scan "+mConnectionState+" "+mServiceUUID);
 
@@ -255,7 +271,7 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 				mBluetoothAdapter.disable();
 				mBluetoothAdapter.enable();
 			}
-			try{ sleep(Config.bleScanDuration);}catch (Exception e){}
+			try{ sleep(2000);}catch (Exception e){}
 			if(!started){
 				Log.d(TAG,"Not started cancelling");
 				return;
@@ -264,8 +280,7 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 		}
 	};
 
-	public void tryConnection(){
-		//String address = android.provider.Settings.Secure.getString(context.getContentResolver(), "bluetooth_address");
+	private void tryConnection(){
 		Log.d(TAG,"TryConnection "+results.size()+" "+started+" "+mConnectionState);
 		if (mConnectionState == STATE_DISCONNECTED) {
 
@@ -315,7 +330,7 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 	 * {@code BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)}
 	 * callback.
 	 */
-	public void disconnect() {
+	private void disconnect() {
 		Log.d(TAG,"Disconnect");
 		mInitialized = false;
 		started=false;
@@ -332,22 +347,6 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 		mBluetoothGatt.close();
 		mBluetoothGatt = null;
 		//try{LocalBroadcastManager.getInstance(context).unregisterReceiver(mBroadcastReceiver);}catch (IllegalArgumentException e){Log.d(TAG,"Unregister failed "+e);}
-	}
-
-	/**
-	 * After using a given BLE device, the app must call this method to ensure resources are
-	 * released properly.
-	 */
-	public void close() {
-		Log.d(TAG,"Close");
-		if (mBluetoothGatt == null) {
-			return;
-		}
-		started=false;
-		mBluetoothGatt.close();
-		//mBluetoothGatt = null;
-		//context.unregisterReceiver(mBroadcastReceiver);
-
 	}
 
 
@@ -371,7 +370,7 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 	private void readCharacteristic(BluetoothGattCharacteristic characteristic) {
 
         byte[] messageBytes = characteristic.getValue();
-        String message = StringUtils.stringFromBytes(messageBytes);
+        String message = new String(messageBytes);
 		Log.d(TAG, "Message from remote: " + message +" pending:"+pendingWrite);
 		sending=false;
         if (message == null) {
@@ -459,7 +458,7 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 			for (BluetoothGattCharacteristic characteristic : matchingCharacteristics) {
 				Log.d(TAG, "characteristic: " + characteristic.getUuid().toString());
 				characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
-				subscribe(characteristic);
+				//subscribe(characteristic);
 				enableCharacteristicNotification(gatt, characteristic);
 
 			}
@@ -501,47 +500,11 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 										 int status) {
 			if (status == BluetoothGatt.GATT_SUCCESS) {
 				Log.d(TAG, "Characteristic Read");
-				printIncoming(characteristic);
+				//printIncoming(characteristic);
 			}
 		}
 	};
 
-
-	private void printIncoming(final BluetoothGattCharacteristic characteristic) {
-		Log.d(TAG, "\n\nBroadcast Update Printing Services!!!\n\n");
-		for(BluetoothGattService b : characteristic.getService().getIncludedServices()) {
-			Log.d(TAG, b.toString());
-		}
-
-		if(Constants.CHARACTERISTIC_DATAHOP_UUID.equals(characteristic.getUuid())) {
-			// For all other profiles, writes the data formatted in HEX.
-			Log.d(TAG, "Received data from Bleno...\n");
-			final byte[] data = characteristic.getValue();
-			if (data != null && data.length > 0) {
-				final StringBuilder stringBuilder = new StringBuilder(data.length);
-				for(byte byteChar : data)
-					stringBuilder.append(String.format("%02X ", byteChar));
-				Log.d(TAG,"Received Data OutPut\n");
-				Log.d(TAG,stringBuilder.toString());
-				Log.d(TAG, "Data received: " + new String(data));
-			}
-		}
-	}
-
-	private void subscribe(BluetoothGattCharacteristic characteristic) {
-		Log.d(TAG, "Subscribing on characteristic");
-
-		if (characteristic == null) {
-			Log.d(TAG,"Characteristic does not exist");
-			return;
-		}
-
-		BluetoothGattDescriptor descriptor = characteristic.getDescriptor(Constants.CLIENT_CONFIGURATION_DESCRIPTOR_UUID);
-		if(descriptor!=null){
-			descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-			mBluetoothGatt.writeDescriptor(descriptor);
-		}
-	}
 
 	private class TryWriting implements Runnable {
 
