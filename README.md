@@ -1,5 +1,9 @@
 # Discovery service library for Android using Bluetooth Low Energy 
 
+# Docs
+
+[Code documentation](https://datahop.github.io/p2p-discovery-ble)
+
 # License
 
 Copyright 2021 Datahop
