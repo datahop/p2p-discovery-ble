@@ -18,8 +18,8 @@ import java.util.UUID;
 import java.util.List;
 import java.util.ArrayList;
 
-import datahop.BleAdvNotifier;
-import datahop.BleAdvertisingDriver;
+import datahop.AdvertisingDriver;
+import datahop.AdvertisementNotifier;
 
 import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_MODE_BALANCED;
 import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM;
@@ -33,7 +33,7 @@ import static android.content.Context.BLUETOOTH_SERVICE;
  * Characteristics are compared in the GATT Server when accepting connections to compare status for each "topic.
  * When detected different values of the "topics" means different service status and it can reply with network information.
  */
-public class BLEAdvertising  implements BleAdvertisingDriver{
+public class BLEAdvertising  implements AdvertisingDriver{
 
     private static final String TAG = BLEAdvertising.class.getSimpleName();
     private BluetoothLeAdvertiser adv;
@@ -48,7 +48,7 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
     private static volatile BLEAdvertising mBleAdvertising;
     private Context context;
 
-    private static BleAdvNotifier notifier;
+    private static AdvertisementNotifier notifier;
 
     private List<UUID> pendingNotifications;
 
@@ -81,7 +81,7 @@ public class BLEAdvertising  implements BleAdvertisingDriver{
      * when creating or destroying the group or when receiving users connections
      * @param notifier instance
      */
-    public void setNotifier(BleAdvNotifier notifier){
+    public void setNotifier(AdvertisementNotifier notifier){
         Log.d(TAG,"Trying to start");
         this.notifier = notifier;
     }

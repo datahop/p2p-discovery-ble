@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import datahop.BleDiscNotifier;
-import datahop.BleDiscoveryDriver;
+import datahop.DiscoveryNotifier;
+import datahop.DiscoveryDriver;
 
 import static android.content.Context.BLUETOOTH_SERVICE;
 import static java.lang.Thread.sleep;
@@ -40,7 +40,7 @@ import static java.lang.Thread.sleep;
  * Characteristics are compared in the GATT Server when accepting connections to compare status for each "topic".
  * When detected different values of the "topics" it receives network information from the server.
  */
-public class BLEServiceDiscovery implements BleDiscoveryDriver{
+public class BLEServiceDiscovery implements DiscoveryDriver{
 
 	private static final String TAG = "BLEServiceDiscovery";
 
@@ -74,7 +74,7 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 
 	private Handler mHandler;
 
-	private static BleDiscNotifier notifier;
+	private static DiscoveryNotifier notifier;
 	private  boolean exit;
 
 	/**
@@ -116,7 +116,7 @@ public class BLEServiceDiscovery implements BleDiscoveryDriver{
 	 * when creating or destroying the group or when receiving users connections
 	 * @param notifier instance
 	 */
-	public void setNotifier(BleDiscNotifier notifier){
+	public void setNotifier(DiscoveryNotifier notifier){
 		Log.d(TAG,"Trying to start");
 		this.notifier = notifier;
 	}

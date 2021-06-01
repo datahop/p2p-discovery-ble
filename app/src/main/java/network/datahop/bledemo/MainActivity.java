@@ -20,14 +20,14 @@ import android.widget.TextView;
 import java.util.Random;
 import java.util.UUID;
 
-import datahop.BleDiscNotifier;
-import datahop.BleAdvNotifier;
+import datahop.AdvertisementNotifier;
+import datahop.DiscoveryNotifier;
 
 
 import network.datahop.blediscovery.BLEAdvertising;
 import network.datahop.blediscovery.BLEServiceDiscovery;
 
-public class MainActivity extends AppCompatActivity implements BleDiscNotifier, BleAdvNotifier {
+public class MainActivity extends AppCompatActivity implements AdvertisementNotifier, DiscoveryNotifier {
 
 
     private Button startButton,stopButton,refreshButton;
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements BleDiscNotifier, 
     }
 
     @Override
-    public void differentStatusDiscovered(byte[] bytes) {
+    public void differentStatusDiscovered(String topic, byte[] bytes) {
         Log.d(TAG,"differentStatusDiscovered");
         advertisingDriver.notifyNetworkInformation(stat,stat,stat);
 
