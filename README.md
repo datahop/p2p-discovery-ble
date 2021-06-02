@@ -27,8 +27,9 @@ The library can be built manually using the following command:
 ```
 $ ./gradlew blediscovery:assembleRelease
 ```
-
 and copy the generated .aar library into the `app/libs` folder of your app.
+
+Note: It requires Datahop Ipfs-lite aar in the libs folder to compile.
 
 To add the library in your Android project first add the libs folder in your repositories list of the project `build.gradle` file,
 
