@@ -83,13 +83,11 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 	 */
 	private BLEServiceDiscovery(Context context)
 	{
-
 		this.context = context;
 		this.mHandler = new Handler(Looper.getMainLooper());
 		this.advertisingInfo = new HashMap<>();
 		this.convertedCharacteristics = new HashMap<>();
 		this.results = new HashSet<BluetoothDevice>();
-
     }
 
 	/* Method used to initialize Bluetooth LE Adapter
@@ -183,7 +181,6 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 
 	private void startScanning(String service_uuid)
 	{
-
 		Log.d(TAG,"startScanning Service uuid:"+service_uuid+" "+started);
 		if(mBluetoothAdapter!=null&&!started) {
 			pendingWrite = 0;
@@ -203,7 +200,6 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 
 			scanLeDevice();
 		}
-
     }
 
 	private void stopScanning()
@@ -212,7 +208,6 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 			mLEScanner.stopScan(mScanCallback);
 			mLEScanner.flushPendingScanResults(mScanCallback);
 		}catch (Exception e){Log.d(TAG,"Failed when stopping ble scanner "+e);}
-
 	}
 
 	private void scanLeDevice() {
@@ -384,9 +379,9 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 				disconnect();
             tryConnection();
         }else {
-        	Log.d(TAG, "Attempting to connect");
         	String msg = new String(messageBytes);
-        	String[] split = msg.split(":");
+			Log.d(TAG, "Attempting to connect :"+msg);
+			String[] split = msg.split(":", 3);
         	if(split.length==3)
 				notifier.peerDifferentStatusDiscovered(device.getName(),convertedCharacteristics.get(characteristic),split[0],split[1],split[2]);
         	else

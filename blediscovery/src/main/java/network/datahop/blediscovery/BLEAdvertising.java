@@ -128,7 +128,7 @@ public class BLEAdvertising  implements AdvertisingDriver{
      * @param serviceid service id
      */
     private void startGATTServer(String serviceid){
-
+        Log.d(TAG, "startGATTServer");
         serverCallback = new GattServerCallback(context, serviceid, advertisingInfo, new DiscoveryListener() {
             @Override
             public void sameStatusDiscovered(UUID characteristic) {
