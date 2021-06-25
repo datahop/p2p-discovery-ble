@@ -306,6 +306,14 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 			return false;
 		}
 
+		List<BluetoothDevice> devices = mBluetoothManager.getConnectedDevices(BluetoothProfile.GATT);
+		for (BluetoothDevice d : devices) {
+			if (d.getAddress().equals(address)) {
+				Log.d(TAG, "Device Connected");
+				return true;
+			}
+		}
+
 		device = mBluetoothAdapter.getRemoteDevice(address);
 		if (device == null) {
 			Log.d(TAG, "Device not found.  Unable to connect.");
