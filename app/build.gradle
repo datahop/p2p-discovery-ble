@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     buildToolsVersion "30.0.1"
 
     defaultConfig {
         applicationId "network.datahop.bledemo"
         minSdkVersion 28
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
@@ -30,6 +30,25 @@ android {
     }
 }
 
+def githubProperties = new Properties()
+githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+
+repositories {
+
+    maven {
+        name = "GitHubPackages"
+        /*  Configure path to the library hosted on GitHub Package Registry
+     *  Replace UserID with package owner userID and REPOSITORY with the repository name
+     *  e.g. "https://maven.pkg.github.com/enefce/AndroidLibraryForGitHubPackagesDemo"
+     */
+        url = uri("https://maven.pkg.github.com/UserID/REPOSITORY")
+
+        credentials {
+            username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
+            password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+        }
+    }
+}
 dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
@@ -38,8 +57,8 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.3.0'
     implementation 'androidx.navigation:navigation-ui:2.3.0'
 
-    implementation project(path: ':blediscovery')
-
+    //implementation project(path: ':blediscovery')
+    implementation 'network.datahop.libraries:blediscovery:0.0.1'
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
