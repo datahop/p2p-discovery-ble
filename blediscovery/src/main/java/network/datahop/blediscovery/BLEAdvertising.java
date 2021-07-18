@@ -133,13 +133,13 @@ public class BLEAdvertising  implements AdvertisingDriver{
             @Override
             public void sameStatusDiscovered(UUID characteristic) {
                 pendingNotifications.add(characteristic);
-                notifier.sameStatusDiscovered();
+                notifier.advertiserPeerSameStatus();
             }
 
             @Override
             public void differentStatusDiscovered(byte[] value,UUID characteristic) {
                 pendingNotifications.add(characteristic);
-                notifier.differentStatusDiscovered(convertedCharacteristics.get(characteristic),value);
+                notifier.advertiserPeerDifferentStatus(convertedCharacteristics.get(characteristic),value);
             }
         });
         mBluetoothGattServer = manager.openGattServer(context, serverCallback);

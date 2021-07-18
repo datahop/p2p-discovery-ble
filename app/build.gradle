@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "30.0.1"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "network.datahop.bledemo"
-        minSdkVersion 28
-        targetSdkVersion 29
+        minSdkVersion 24
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -42,7 +42,7 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.3.0'
 
     //implementation project(path: ':blediscovery')
-    implementation 'network.datahop.libraries:blediscovery:0.0.1'
+    implementation 'network.datahop.libs:blediscovery:0.0.1'
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

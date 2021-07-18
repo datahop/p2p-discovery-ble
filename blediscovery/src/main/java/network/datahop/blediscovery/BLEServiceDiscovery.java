@@ -382,7 +382,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
         }
 		pendingWrite--;
 		if (Arrays.equals(new byte[]{0x00}, messageBytes)){
-            notifier.peerSameStatusDiscovered(device.getName(),convertedCharacteristics.get(characteristic));
+            notifier.discoveryPeerSameStatus(device.getName(),convertedCharacteristics.get(characteristic));
             if (pendingWrite<=0)
 				disconnect();
             tryConnection();
@@ -391,9 +391,9 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 			Log.d(TAG, "Attempting to connect :"+msg);
 			String[] split = msg.split(":", 3);
         	if(split.length==3)
-				notifier.peerDifferentStatusDiscovered(device.getName(),convertedCharacteristics.get(characteristic),split[0],split[1],split[2]);
+				notifier.discoveryPeerDifferentStatus(device.getName(),convertedCharacteristics.get(characteristic),split[0],split[1],split[2]);
         	else
-        		notifier.peerSameStatusDiscovered(device.getName(),convertedCharacteristics.get(characteristic));
+        		notifier.discoveryPeerSameStatus(device.getName(),convertedCharacteristics.get(characteristic));
 			disconnect();
 			//started=false;
 			//close();
