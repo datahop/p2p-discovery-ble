@@ -163,6 +163,8 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 		Log.d(TAG,"Stop");
 		exit=true;
 		stopScanning();
+		disconnect();
+
 	}
 
 	/**
@@ -392,9 +394,12 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 			String[] split = msg.split(":", 3);
         	if(split.length==3)
 				notifier.discoveryPeerDifferentStatus(device.getName(),convertedCharacteristics.get(characteristic),split[0],split[1],split[2]);
-        	else
-        		notifier.discoveryPeerSameStatus(device.getName(),convertedCharacteristics.get(characteristic));
-			disconnect();
+        	else {
+				notifier.discoveryPeerSameStatus(device.getName(), convertedCharacteristics.get(characteristic));
+				if (pendingWrite <= 0)
+					disconnect();
+				tryConnection();
+			}
 			//started=false;
 			//close();
 			//results.clear();
@@ -445,6 +450,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 
 			if (status != BluetoothGatt.GATT_SUCCESS) {
 				Log.d(TAG,"Device service discovery unsuccessful, status " + status);
+				disconnect();
 				return;
 			}
 
@@ -455,6 +461,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 			List<BluetoothGattCharacteristic> matchingCharacteristics = BluetoothUtils.findCharacteristics(gatt,mServiceUUID.getUuid(),groups);
 			if (matchingCharacteristics.isEmpty()) {
 				Log.d(TAG,"Unable to find characteristics.");
+				disconnect();
 				return;
 			}
 

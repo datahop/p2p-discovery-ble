@@ -13,6 +13,7 @@ import android.content.Context;
 import android.os.ParcelUuid;
 import android.util.Log;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.List;
@@ -24,6 +25,7 @@ import datahop.AdvertisementNotifier;
 import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_MODE_BALANCED;
 import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM;
 import static android.content.Context.BLUETOOTH_SERVICE;
+import static java.lang.Thread.sleep;
 
 /**
  * BLEAdvertising class is used for service discovery using Bluetooth Low Energy beacons.
@@ -51,6 +53,9 @@ public class BLEAdvertising  implements AdvertisingDriver{
     private static AdvertisementNotifier notifier;
 
     private List<UUID> pendingNotifications;
+
+
+    private String serviceId;
 
     /**
      * BLEAdvertising class constructor
@@ -92,6 +97,7 @@ public class BLEAdvertising  implements AdvertisingDriver{
      * @param serviceid service id
      */
     public void start(String serviceid) {
+        this.serviceId = serviceid;
         Log.d(TAG, "Starting ADV, Tx power " + serviceid.toString());
 
         if (notifier == null) {
@@ -172,8 +178,8 @@ public class BLEAdvertising  implements AdvertisingDriver{
     @Override
     public void stop() {
         Log.d(TAG, "Stopping ADV");
-        adv.stopAdvertising(advertiseCallback);
-        serverCallback.stop();
+        if(adv!=null)adv.stopAdvertising(advertiseCallback);
+        if(serverCallback!=null)serverCallback.stop();
     }
 
     /**
@@ -184,8 +190,15 @@ public class BLEAdvertising  implements AdvertisingDriver{
      */
     @Override
     public void addAdvertisingInfo(String topic, byte[] info){
-        advertisingInfo.put(UUID.nameUUIDFromBytes(topic.getBytes()),info);
-        convertedCharacteristics.put(UUID.nameUUIDFromBytes(topic.getBytes()),topic);
+        if(advertisingInfo.get(topic)!=null) {
+            if (Arrays.equals(advertisingInfo.get(topic),info)) {
+                return;
+            }
+        }
+        advertisingInfo.put(UUID.nameUUIDFromBytes(topic.getBytes()), info);
+        convertedCharacteristics.put(UUID.nameUUIDFromBytes(topic.getBytes()), topic);
+        restart();
+
     }
 
     /**
@@ -209,6 +222,18 @@ public class BLEAdvertising  implements AdvertisingDriver{
     public void notifyEmptyValue(){
         for(UUID characteristic : pendingNotifications)
             serverCallback.notifyCharacteristic(new byte[]{0x00}, characteristic);
+    }
+
+
+    private void restart()  {
+        //try {
+            stop();
+            //sleep(3);
+            start(this.serviceId);
+        /*} catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+
     }
 
 
