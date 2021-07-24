@@ -36,11 +36,11 @@ public class GattServerCallback extends BluetoothGattServerCallback {
     BluetoothGattCharacteristic mCharacteristic;
     ParcelUuid mServiceUUID;
     private static final String TAG = "GattServerCallback";
-    private HashMap<UUID, byte[]> advertisingInfo;
+    private HashMap<UUID, String> advertisingInfo;
 
     DiscoveryListener listener;
 
-    public GattServerCallback(Context context, String parcelUuid, HashMap<UUID, byte[]> advertisingInfo, DiscoveryListener listener) {//WifiDirectHotSpot hotspot, HashMap<UUID,ContentAdvertisement> ca, ParcelUuid service_uuid,StatsHandler stats,List<String> groups) {
+    public GattServerCallback(Context context, String parcelUuid, HashMap<UUID, String> advertisingInfo, DiscoveryListener listener) {//WifiDirectHotSpot hotspot, HashMap<UUID,ContentAdvertisement> ca, ParcelUuid service_uuid,StatsHandler stats,List<String> groups) {
 
         mDevices = new ArrayList<>();
         mClientConfigurations = new HashMap<>();

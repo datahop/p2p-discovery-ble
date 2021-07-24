@@ -27,6 +27,10 @@ import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM;
 import static android.content.Context.BLUETOOTH_SERVICE;
 import static java.lang.Thread.sleep;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * BLEAdvertising class is used for service discovery using Bluetooth Low Energy beacons.
  * BLEAdvertising is responsible of advertising service discovery data and exchange service status
@@ -44,7 +48,7 @@ public class BLEAdvertising  implements AdvertisingDriver{
     private BluetoothAdapter btAdapter;
     private GattServerCallback serverCallback;
     private BluetoothGattServer mBluetoothGattServer;
-    private HashMap<UUID,byte[]> advertisingInfo;
+    private HashMap<UUID,String> advertisingInfo;
     private HashMap<UUID,String> convertedCharacteristics;
 
     private static volatile BLEAdvertising mBleAdvertising;
@@ -63,7 +67,7 @@ public class BLEAdvertising  implements AdvertisingDriver{
      * @param Android context
      */
     private BLEAdvertising(Context context){
-
+        Log.d(TAG,"New bleadvertising");
         this.manager = (BluetoothManager) context.getSystemService(BLUETOOTH_SERVICE);
         this.btAdapter = manager.getAdapter();
         this.context = context;
@@ -193,17 +197,28 @@ public class BLEAdvertising  implements AdvertisingDriver{
      */
     @Override
     public void addAdvertisingInfo(String topic, byte[] info){
-        Log.d(TAG,"Advertising info "+topic+" "+info);
-        if(advertisingInfo.get(topic)!=null) {
-            Log.d(TAG,"Advertising info not null "+advertisingInfo.get(topic)+" "+info);
-            if (Arrays.equals(advertisingInfo.get(topic),info)) {
-                Log.d(TAG,"Advertising info equal");
-                return;
+        String inf = new String(info);
+        Log.d(TAG,"Advertising info "+topic+" "+inf);
+        try {
+            final JSONObject obj = new JSONObject(inf);
+
+            //JSONArray jo = new JSONArray(Arrays.toString(info));
+            String bf = obj.getString("b");
+            Log.d(TAG,bf);
+            if(advertisingInfo.get(UUID.nameUUIDFromBytes(topic.getBytes()))!=null) {
+                Log.d(TAG,"Advertising info not null "+advertisingInfo.get(topic)+" "+bf);
+                if (advertisingInfo.get(UUID.nameUUIDFromBytes(topic.getBytes())).equals(bf)) {
+                    Log.d(TAG,"Advertising info equal");
+                    return;
+                }
             }
+            advertisingInfo.put(UUID.nameUUIDFromBytes(topic.getBytes()), bf);
+            convertedCharacteristics.put(UUID.nameUUIDFromBytes(topic.getBytes()), topic);
+            if(started)restart();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        advertisingInfo.put(UUID.nameUUIDFromBytes(topic.getBytes()), info);
-        convertedCharacteristics.put(UUID.nameUUIDFromBytes(topic.getBytes()), topic);
-        if(started)restart();
+
 
     }
 
