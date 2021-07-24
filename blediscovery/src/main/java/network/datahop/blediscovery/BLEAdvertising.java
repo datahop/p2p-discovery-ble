@@ -57,6 +57,7 @@ public class BLEAdvertising  implements AdvertisingDriver{
 
     private String serviceId;
 
+    private boolean started;
     /**
      * BLEAdvertising class constructor
      * @param Android context
@@ -96,20 +97,20 @@ public class BLEAdvertising  implements AdvertisingDriver{
      * and starts the GATT server
      * @param serviceid service id
      */
-    public void start(String serviceid) {
-        this.serviceId = serviceid;
-        Log.d(TAG, "Starting ADV, Tx power " + serviceid.toString());
+    public void start(String serviceId) {
+        this.serviceId = serviceId;
+        Log.d(TAG, "Starting ADV, Tx power " + this.serviceId.toString());
 
-        if (notifier == null) {
+        if (notifier == null || this.serviceId == null) {
             Log.e(TAG, "notifier not found");
             return ;
         }
         if (btAdapter != null) {
             if (btAdapter.isMultipleAdvertisementSupported()) {
-                Log.d(TAG, "Starting ADV2, Tx power " + serviceid.toString());
+                Log.d(TAG, "Starting ADV2, Tx power " + this.serviceId.toString());
                 adv = btAdapter.getBluetoothLeAdvertiser();
                 advertiseCallback = createAdvertiseCallback();
-                ParcelUuid mServiceUUID = new ParcelUuid(UUID.nameUUIDFromBytes(serviceid.getBytes()));
+                ParcelUuid mServiceUUID = new ParcelUuid(UUID.nameUUIDFromBytes(this.serviceId.getBytes()));
 
                 AdvertiseSettings advertiseSettings = new AdvertiseSettings.Builder()
                         .setAdvertiseMode(ADVERTISE_MODE_BALANCED)
@@ -126,7 +127,8 @@ public class BLEAdvertising  implements AdvertisingDriver{
                 adv.startAdvertising(advertiseSettings, advertiseData, advertiseCallback);
             }
         }
-        startGATTServer(serviceid);
+        startGATTServer(this.serviceId);
+        started=true;
     }
 
     /**
@@ -177,6 +179,7 @@ public class BLEAdvertising  implements AdvertisingDriver{
      */
     @Override
     public void stop() {
+        started=false;
         Log.d(TAG, "Stopping ADV");
         if(adv!=null)adv.stopAdvertising(advertiseCallback);
         if(serverCallback!=null)serverCallback.stop();
@@ -190,8 +193,9 @@ public class BLEAdvertising  implements AdvertisingDriver{
      */
     @Override
     public void addAdvertisingInfo(String topic, byte[] info){
+        Log.d(TAG,"Advertising info "+topic+" "+info);
         if(advertisingInfo.get(topic)!=null) {
-            Log.d(TAG,"Advertising info not null "advertisingInfo.get(topic)+" "+info);
+            Log.d(TAG,"Advertising info not null "+advertisingInfo.get(topic)+" "+info);
             if (Arrays.equals(advertisingInfo.get(topic),info)) {
                 Log.d(TAG,"Advertising info equal");
                 return;
@@ -199,7 +203,7 @@ public class BLEAdvertising  implements AdvertisingDriver{
         }
         advertisingInfo.put(UUID.nameUUIDFromBytes(topic.getBytes()), info);
         convertedCharacteristics.put(UUID.nameUUIDFromBytes(topic.getBytes()), topic);
-        restart();
+        if(started)restart();
 
     }
 
