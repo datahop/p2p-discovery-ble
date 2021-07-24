@@ -184,21 +184,21 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
     }
 
     @Override
-    public void differentStatusDiscovered(String topic, byte[] bytes) {
+    public void advertiserPeerDifferentStatus(String topic, byte[] bytes) {
         Log.d(TAG,"differentStatusDiscovered");
         advertisingDriver.notifyNetworkInformation(stat,stat,stat);
 
     }
 
     @Override
-    public void sameStatusDiscovered() {
+    public void advertiserPeerSameStatus() {
         Log.d(TAG,"sameStatusDiscovered");
         advertisingDriver.notifyEmptyValue();
 
     }
 
     @Override
-    public void peerDifferentStatusDiscovered(String device, String topic, String network, String pass, String info) {
+    public void discoveryPeerDifferentStatus(String device, String topic, String network, String pass, String info) {
         Log.d(TAG,"peerDifferentStatusDiscovered "+device+" "+topic+" "+network+" "+pass+" "+info);
         stat = network;
         counter++;
@@ -216,13 +216,13 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
         advertisingDriver.start(TAG);
     }
 
-    @Override
+    /*@Override
     public void peerDiscovered(String s) {
         Log.d(TAG,"peerDiscovered "+s);
-    }
+    }*/
 
     @Override
-    public void peerSameStatusDiscovered(String device, String topic) {
+    public void discoveryPeerSameStatus(String device, String topic) {
         Log.d(TAG,"peerSameStatusDiscovered "+device+" "+topic);
 
     }
