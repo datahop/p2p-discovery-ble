@@ -191,7 +191,9 @@ public class BLEAdvertising  implements AdvertisingDriver{
     @Override
     public void addAdvertisingInfo(String topic, byte[] info){
         if(advertisingInfo.get(topic)!=null) {
+            Log.d(TAG,"Advertising info not null "advertisingInfo.get(topic)+" "+info);
             if (Arrays.equals(advertisingInfo.get(topic),info)) {
+                Log.d(TAG,"Advertising info equal");
                 return;
             }
         }

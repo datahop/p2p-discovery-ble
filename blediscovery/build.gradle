@@ -38,7 +38,7 @@ dependencies {
 }
 
 def getVersionName = {
-    return "0.0.1"  // Replace with version Name
+    return "0.0.3"  // Replace with version Name
 }
 
 def getArtifactId = {
