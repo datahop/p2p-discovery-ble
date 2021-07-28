@@ -73,8 +73,8 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
                         status.setText("Status: "+stat);
                     }
                 });
-                advertisingDriver.addAdvertisingInfo("bledemo",stat.getBytes());
-                discoveryDriver.addAdvertisingInfo("bledemo",stat.getBytes());
+                advertisingDriver.addAdvertisingInfo("bledemo",stat);
+                discoveryDriver.addAdvertisingInfo("bledemo",stat);
                 advertisingDriver.start(TAG);
                 discoveryDriver.start(TAG,2000,30000);
             }
@@ -96,8 +96,8 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
                 stat = randomString();
                 status.setText("Status: "+stat);
 
-                advertisingDriver.addAdvertisingInfo("bledemo",stat.getBytes());
-                discoveryDriver.addAdvertisingInfo("bledemo",stat.getBytes());
+                advertisingDriver.addAdvertisingInfo("bledemo",stat);
+                discoveryDriver.addAdvertisingInfo("bledemo",stat);
                 advertisingDriver.stop();
                 advertisingDriver.start(TAG);
             }
@@ -210,8 +210,8 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
             }
         });
 
-        advertisingDriver.addAdvertisingInfo("bledemo",stat.getBytes());
-        discoveryDriver.addAdvertisingInfo("bledemo",stat.getBytes());
+        advertisingDriver.addAdvertisingInfo("bledemo",stat);
+        discoveryDriver.addAdvertisingInfo("bledemo",stat);
         advertisingDriver.stop();
         advertisingDriver.start(TAG);
     }

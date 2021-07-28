@@ -58,7 +58,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 	private static final int STATE_CONNECTING = 1;
 	private static final int STATE_CONNECTED = 2;
 
-	private HashMap<UUID,byte[]> advertisingInfo;
+	private HashMap<UUID,String> advertisingInfo;
 	private HashMap<UUID,String> convertedCharacteristics;
 	private Set<BluetoothDevice> results;
 
@@ -174,9 +174,8 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 	 * @param info value advertised
 	 */
 	@Override
-	public void addAdvertisingInfo(String characteristic, byte[] info){
-		String inf = new String(info);
-		Log.d(TAG,"addAdvertisingInfo "+characteristic+" "+inf);
+	public void addAdvertisingInfo(String characteristic, String info){
+		Log.d(TAG,"addAdvertisingInfo "+characteristic+" "+info);
 		advertisingInfo.put(UUID.nameUUIDFromBytes(characteristic.getBytes()),info);
 		convertedCharacteristics.put(UUID.nameUUIDFromBytes(characteristic.getBytes()),characteristic);
 	}
@@ -543,7 +542,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 
 				for(UUID uuid : advertisingInfo.keySet()){
 					Log.d(TAG,"Advertising info uuid "+uuid+" "+characteristic.getUuid());
-					if(characteristic.getUuid().equals(uuid))messageBytes=advertisingInfo.get(uuid);
+					if(characteristic.getUuid().equals(uuid))messageBytes=advertisingInfo.get(uuid).getBytes();
 					break;
 				}
 

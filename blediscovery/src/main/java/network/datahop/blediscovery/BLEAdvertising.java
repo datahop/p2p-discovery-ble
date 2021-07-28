@@ -196,28 +196,21 @@ public class BLEAdvertising  implements AdvertisingDriver{
      * @param info value advertised
      */
     @Override
-    public void addAdvertisingInfo(String topic, byte[] info){
-        String inf = new String(info);
-        Log.d(TAG,"Advertising info "+topic+" "+inf);
-        try {
-            final JSONObject obj = new JSONObject(inf);
+    public void addAdvertisingInfo(String topic, String info){
+        //String inf = new String(info);
+        Log.d(TAG,"Advertising info "+topic+" "+info);
 
-            //JSONArray jo = new JSONArray(Arrays.toString(info));
-            String bf = obj.getString("b");
-            Log.d(TAG,bf);
-            if(advertisingInfo.get(UUID.nameUUIDFromBytes(topic.getBytes()))!=null) {
-                Log.d(TAG,"Advertising info not null "+advertisingInfo.get(topic)+" "+bf);
-                if (advertisingInfo.get(UUID.nameUUIDFromBytes(topic.getBytes())).equals(bf)) {
-                    Log.d(TAG,"Advertising info equal");
-                    return;
-                }
+        if(advertisingInfo.get(UUID.nameUUIDFromBytes(topic.getBytes()))!=null) {
+            Log.d(TAG,"Advertising info not null "+advertisingInfo.get(topic)+" "+info);
+            if (advertisingInfo.get(UUID.nameUUIDFromBytes(topic.getBytes())).equals(info)) {
+                Log.d(TAG,"Advertising info equal");
+                return;
             }
-            advertisingInfo.put(UUID.nameUUIDFromBytes(topic.getBytes()), bf);
-            convertedCharacteristics.put(UUID.nameUUIDFromBytes(topic.getBytes()), topic);
-            if(started)restart();
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
+        advertisingInfo.put(UUID.nameUUIDFromBytes(topic.getBytes()), info);
+        convertedCharacteristics.put(UUID.nameUUIDFromBytes(topic.getBytes()), topic);
+        if(started)restart();
+
 
 
     }
