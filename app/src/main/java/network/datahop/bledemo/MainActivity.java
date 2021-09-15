@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
 
     private Button startAdvButton,startDiscButton,stopButton,refreshButton;
 
-    private TextView status, discovery;
+    private TextView status, discovery, peerId;
     private BLEAdvertising advertisingDriver;
     private BLEServiceDiscovery discoveryDriver;
 
@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
     private boolean adv;
 
     private boolean disc;
+
+    private String id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +61,11 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
         discoveryDriver = BLEServiceDiscovery.getInstance(getApplicationContext());
         advertisingDriver.setNotifier(this);
         discoveryDriver.setNotifier(this);
+
+        peerId = (TextView) findViewById(R.id.textview_peerid);
+
+        this.id = randomString();
+        peerId.setText("PeerId: "+id);
 
         startDiscButton = (Button) findViewById(R.id.startdiscovery);
         startAdvButton = (Button) findViewById(R.id.startadvertisement);
@@ -85,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
                 discoveryDriver.addAdvertisingInfo("bledemo",stat);
                 disc=true;
                 //advertisingDriver.start(TAG,"peerId");
-                discoveryDriver.start(TAG,"peerId",2000,30000);
+                discoveryDriver.start(TAG,id,2000,30000);
             }
         });
 
@@ -102,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
                 adv=true;
                 advertisingDriver.addAdvertisingInfo("bledemo",stat);
                 //discoveryDriver.addAdvertisingInfo("bledemo",stat);
-                advertisingDriver.start(TAG,"peerId");
+                advertisingDriver.start(TAG,id);
                 //discoveryDriver.start(TAG,"peerId",2000,30000);
             }
         });
@@ -126,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
                 advertisingDriver.addAdvertisingInfo("bledemo",stat);
                 discoveryDriver.addAdvertisingInfo("bledemo",stat);
                 advertisingDriver.stop();
-                advertisingDriver.start(TAG,"peerId");
+                advertisingDriver.start(TAG,id);
             }
         });
 

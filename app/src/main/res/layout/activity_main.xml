@@ -20,13 +20,22 @@
         app:layout_constraintVertical_bias="0.344" />
 
     <TextView
+        android:id="@+id/textview_peerid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PeerId:"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textview_status" />
+
+    <TextView
         android:id="@+id/textview_discovery"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Users discovered:"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_status" />
+        app:layout_constraintTop_toBottomOf="@id/textview_peerid" />
 
     <Button
         android:id="@+id/refreshbutton"
