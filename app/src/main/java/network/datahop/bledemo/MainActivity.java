@@ -30,7 +30,7 @@ import network.datahop.blediscovery.BLEServiceDiscovery;
 public class MainActivity extends AppCompatActivity implements AdvertisementNotifier, DiscoveryNotifier {
 
 
-    private Button startButton,stopButton,refreshButton;
+    private Button startAdvButton,startDiscButton,stopButton,refreshButton;
 
     private TextView status, discovery;
     private BLEAdvertising advertisingDriver;
@@ -54,7 +54,9 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
         advertisingDriver.setNotifier(this);
         discoveryDriver.setNotifier(this);
 
-        startButton = (Button) findViewById(R.id.startbutton);
+        startDiscButton = (Button) findViewById(R.id.startdiscovery);
+        startAdvButton = (Button) findViewById(R.id.startadvertisement);
+
         stopButton = (Button) findViewById(R.id.stopbutton);
         refreshButton = (Button) findViewById(R.id.refreshbutton);
 
@@ -63,7 +65,24 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
 
         discovery.setText("Users discovered: "+counter);
         requestForPermissions();
-        startButton.setOnClickListener(new View.OnClickListener() {
+        startDiscButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stat = randomString();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        status.setText("Status: "+stat);
+                    }
+                });
+                //advertisingDriver.addAdvertisingInfo("bledemo",stat);
+                discoveryDriver.addAdvertisingInfo("bledemo",stat);
+                //advertisingDriver.start(TAG,"peerId");
+                discoveryDriver.start(TAG,"peerId",2000,30000);
+            }
+        });
+
+        startAdvButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 stat = randomString();
@@ -74,9 +93,9 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
                     }
                 });
                 advertisingDriver.addAdvertisingInfo("bledemo",stat);
-                discoveryDriver.addAdvertisingInfo("bledemo",stat);
+                //discoveryDriver.addAdvertisingInfo("bledemo",stat);
                 advertisingDriver.start(TAG,"peerId");
-                discoveryDriver.start(TAG,"peerId",2000,30000);
+                //discoveryDriver.start(TAG,"peerId",2000,30000);
             }
         });
 
