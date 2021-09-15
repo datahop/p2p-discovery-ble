@@ -77,6 +77,8 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 	private static DiscoveryNotifier notifier;
 	private  boolean exit;
 
+	private String peerInfo;
+
 	/**
 	 * BLEServiceDiscovery class constructor
 	 * @param Android context
@@ -126,12 +128,13 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 	 * @param idleTime idle time before starting another scan cycle
 	 */
 	@Override
-	public void start(String service_uuid,long scanTime, long idleTime) {
+	public void start(String service_uuid,String peerInfo, long scanTime, long idleTime) {
 		if (notifier == null) {
 			Log.e(TAG, "notifier not found");
 			return ;
 		}
 		exit=false;
+		this.peerInfo = peerInfo;
 		startScanning(service_uuid);
 		Handler handler = new Handler(Looper.getMainLooper());
 		handler.postDelayed(new Runnable() {
@@ -145,7 +148,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 					public void run() {
 						if(!exit){
 							Log.d(TAG,"Start service");
-							start(service_uuid,scanTime,idleTime);
+							start(service_uuid,peerInfo,scanTime,idleTime);
 						}
 					}
 				}, idleTime);
@@ -454,7 +457,6 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 			}
 
 			Log.d(TAG,"Gatt "+gatt.getServices().size());
-
 			List<UUID> groups = new ArrayList<>();
 			groups.addAll(advertisingInfo.keySet());
 			List<BluetoothGattCharacteristic> matchingCharacteristics = BluetoothUtils.findCharacteristics(gatt,mServiceUUID.getUuid(),groups);
@@ -542,7 +544,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 
 				for(UUID uuid : advertisingInfo.keySet()){
 					Log.d(TAG,"Advertising info uuid "+uuid+" "+characteristic.getUuid());
-					if(characteristic.getUuid().equals(uuid))messageBytes=advertisingInfo.get(uuid).getBytes();
+					if(characteristic.getUuid().equals(uuid))messageBytes=(advertisingInfo.get(uuid)+":"+peerInfo).getBytes();
 					break;
 				}
 

@@ -117,12 +117,13 @@ public class GattServerCallback extends BluetoothGattServerCallback {
         Log.d(TAG, "onCharacteristicWriteRequest");
         if (BluetoothUtils.matchAnyCharacteristic(characteristic.getUuid(), groups)) {
             mGattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null);
-            String valueString = new String(value);
+            String valueString = new String(value).split(":")[0];
+            String peerId = new String(value).split(":")[1];
             String valueString2 = new String(advertisingInfo.get(characteristic.getUuid()));
             Log.d(TAG, "Characteristic check " + characteristic.getUuid().toString() + " " + network + " " + valueString2 + " " + valueString);
             if (!valueString.equals(valueString2)) {
                 Log.d(TAG, "Connecting");
-                listener.differentStatusDiscovered(value,characteristic.getUuid());
+                listener.differentStatusDiscovered(value,characteristic.getUuid(),peerId);
 
             } else {
                 Log.d(TAG, "Not Connecting");

@@ -8,5 +8,5 @@ import java.util.UUID;
 public interface DiscoveryListener {
 
     void sameStatusDiscovered(UUID characteristic);
-    void differentStatusDiscovered(byte[] value, UUID characteristic);
+    void differentStatusDiscovered(byte[] value, UUID characteristic,String peerId);
 }

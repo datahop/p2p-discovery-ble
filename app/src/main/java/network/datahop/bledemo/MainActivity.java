@@ -75,8 +75,8 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
                 });
                 advertisingDriver.addAdvertisingInfo("bledemo",stat);
                 discoveryDriver.addAdvertisingInfo("bledemo",stat);
-                advertisingDriver.start(TAG);
-                discoveryDriver.start(TAG,2000,30000);
+                advertisingDriver.start(TAG,"peerId");
+                discoveryDriver.start(TAG,"peerId",2000,30000);
             }
         });
 
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
                 advertisingDriver.addAdvertisingInfo("bledemo",stat);
                 discoveryDriver.addAdvertisingInfo("bledemo",stat);
                 advertisingDriver.stop();
-                advertisingDriver.start(TAG);
+                advertisingDriver.start(TAG,"peerId");
             }
         });
 
@@ -184,9 +184,9 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
     }
 
     @Override
-    public void advertiserPeerDifferentStatus(String topic, byte[] bytes) {
-        Log.d(TAG,"differentStatusDiscovered");
-        advertisingDriver.notifyNetworkInformation(stat,stat,stat);
+    public void advertiserPeerDifferentStatus(String topic, byte[] bytes, String peerinfo) {
+        Log.d(TAG,"differentStatusDiscovered "+topic+" "+peerinfo);
+        advertisingDriver.notifyNetworkInformation(stat,stat);
 
     }
 
@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
         advertisingDriver.addAdvertisingInfo("bledemo",stat);
         discoveryDriver.addAdvertisingInfo("bledemo",stat);
         advertisingDriver.stop();
-        advertisingDriver.start(TAG);
+        advertisingDriver.start(TAG,"peerId");
     }
 
     /*@Override

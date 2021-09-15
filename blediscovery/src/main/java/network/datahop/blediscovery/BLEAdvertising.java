@@ -62,6 +62,8 @@ public class BLEAdvertising  implements AdvertisingDriver{
     private String serviceId;
 
     private boolean started;
+
+    private String peerInfo;
     /**
      * BLEAdvertising class constructor
      * @param Android context
@@ -101,8 +103,9 @@ public class BLEAdvertising  implements AdvertisingDriver{
      * and starts the GATT server
      * @param serviceid service id
      */
-    public void start(String serviceId) {
+    public void start(String serviceId, String peerInfo) {
         this.serviceId = serviceId;
+        this.peerInfo = peerInfo;
         Log.d(TAG, "Starting ADV, Tx power " + this.serviceId.toString());
 
         if (notifier == null || this.serviceId == null) {
@@ -149,9 +152,9 @@ public class BLEAdvertising  implements AdvertisingDriver{
             }
 
             @Override
-            public void differentStatusDiscovered(byte[] value,UUID characteristic) {
+            public void differentStatusDiscovered(byte[] value,UUID characteristic,String peerId) {
                 pendingNotifications.add(characteristic);
-                notifier.advertiserPeerDifferentStatus(convertedCharacteristics.get(characteristic),value);
+                notifier.advertiserPeerDifferentStatus(convertedCharacteristics.get(characteristic),value,peerId);
             }
         });
         mBluetoothGattServer = manager.openGattServer(context, serverCallback);
@@ -222,9 +225,9 @@ public class BLEAdvertising  implements AdvertisingDriver{
      * @param info  other network information
      */
     @Override
-    public void notifyNetworkInformation(String network, String password, String info){
+    public void notifyNetworkInformation(String network, String password){
 
-        String msg = network+":"+password+":"+info;
+        String msg = network+":"+password+":"+peerInfo;
         for(UUID characteristic : pendingNotifications)
             serverCallback.notifyCharacteristic(msg.getBytes(), characteristic);
     }
@@ -243,7 +246,7 @@ public class BLEAdvertising  implements AdvertisingDriver{
         //try {
             stop();
             //sleep(3);
-            start(this.serviceId);
+            start(this.serviceId,this.peerInfo);
         /*} catch (InterruptedException e) {
             e.printStackTrace();
         }*/
