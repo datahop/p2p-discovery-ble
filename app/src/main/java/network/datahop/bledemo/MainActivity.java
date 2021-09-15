@@ -44,11 +44,17 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
     private String stat;
 
     private int counter;
+
+    private boolean adv;
+
+    private boolean disc;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         counter=0;
+        adv=false;
+        disc=false;
         advertisingDriver = BLEAdvertising.getInstance(getApplicationContext());
         discoveryDriver = BLEServiceDiscovery.getInstance(getApplicationContext());
         advertisingDriver.setNotifier(this);
@@ -77,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
                 });
                 //advertisingDriver.addAdvertisingInfo("bledemo",stat);
                 discoveryDriver.addAdvertisingInfo("bledemo",stat);
+                disc=true;
                 //advertisingDriver.start(TAG,"peerId");
                 discoveryDriver.start(TAG,"peerId",2000,30000);
             }
@@ -92,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
                         status.setText("Status: "+stat);
                     }
                 });
+                adv=true;
                 advertisingDriver.addAdvertisingInfo("bledemo",stat);
                 //discoveryDriver.addAdvertisingInfo("bledemo",stat);
                 advertisingDriver.start(TAG,"peerId");
@@ -228,11 +236,17 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
                 status.setText("Status: "+stat);
             }
         });
+        if(adv){
+            advertisingDriver.addAdvertisingInfo("bledemo",stat);
+            advertisingDriver.stop();
+            advertisingDriver.start(TAG,"peerId");
+        }
+        if(disc){
+            discoveryDriver.addAdvertisingInfo("bledemo",stat);
+            //discoveryDriver.stop();
+            //discoveryDriver.start(TAG,"peerId",2000,30000);
+        }
 
-        advertisingDriver.addAdvertisingInfo("bledemo",stat);
-        discoveryDriver.addAdvertisingInfo("bledemo",stat);
-        advertisingDriver.stop();
-        advertisingDriver.start(TAG,"peerId");
     }
 
     /*@Override
