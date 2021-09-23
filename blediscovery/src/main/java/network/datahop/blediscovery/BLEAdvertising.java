@@ -13,7 +13,6 @@ import android.content.Context;
 import android.os.ParcelUuid;
 import android.util.Log;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.List;
@@ -25,11 +24,6 @@ import datahop.AdvertisementNotifier;
 import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_MODE_BALANCED;
 import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM;
 import static android.content.Context.BLUETOOTH_SERVICE;
-import static java.lang.Thread.sleep;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * BLEAdvertising class is used for service discovery using Bluetooth Low Energy beacons.
