@@ -55,6 +55,7 @@ public class GattServerCallback extends BluetoothGattServerCallback {
     }
 
     public void stop() {
+
         if(mGattServer!=null)mGattServer.close();
         network = password = null;
         mGattServer = null;

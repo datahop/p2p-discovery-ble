@@ -72,7 +72,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 	private int pendingWrite;
 	private boolean sending;
 
-	private Handler mHandler;
+	private Handler mHandler,sHandler;
 
 	private static DiscoveryNotifier notifier;
 	private  boolean exit;
@@ -87,6 +87,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 	{
 		this.context = context;
 		this.mHandler = new Handler(Looper.getMainLooper());
+		this.sHandler = new Handler(Looper.getMainLooper());
 		this.advertisingInfo = new HashMap<>();
 		this.convertedCharacteristics = new HashMap<>();
 		this.results = new HashSet<BluetoothDevice>();
@@ -136,8 +137,10 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 		exit=false;
 		this.peerInfo = peerInfo;
 		startScanning(service_uuid);
-		Handler handler = new Handler(Looper.getMainLooper());
-		handler.postDelayed(new Runnable() {
+		mHandler.removeCallbacksAndMessages(null);
+		sHandler.removeCallbacksAndMessages(null);
+
+		sHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				Log.d(TAG, "Stop scan");
@@ -326,6 +329,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 		// We want to directly connect to the device, so we are setting the autoConnect
 		// parameter to false.
 		mBluetoothGatt = device.connectGatt(context, false, mGattCallback);
+
 		Log.d(TAG, "Trying to create a new connection to "+address);
 		mConnectionState = STATE_CONNECTING;
 		return true;
