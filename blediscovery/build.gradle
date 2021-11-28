@@ -10,8 +10,6 @@ android {
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 30
-        versionCode 0
-        versionName "alpha"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,7 +37,7 @@ dependencies {
 }
 
 def getVersionName = {
-    return "0.0.6"  // Replace with version Name
+    return "0.0.7"  // Replace with version Name
 }
 
 def getArtifactId = {

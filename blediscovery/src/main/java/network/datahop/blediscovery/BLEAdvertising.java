@@ -13,6 +13,7 @@ import android.content.Context;
 import android.os.ParcelUuid;
 import android.util.Log;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.List;
@@ -24,6 +25,8 @@ import datahop.AdvertisementNotifier;
 import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_MODE_BALANCED;
 import static android.bluetooth.le.AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM;
 import static android.content.Context.BLUETOOTH_SERVICE;
+
+import javax.crypto.SecretKey;
 
 /**
  * BLEAdvertising class is used for service discovery using Bluetooth Low Energy beacons.
@@ -58,9 +61,12 @@ public class BLEAdvertising  implements AdvertisingDriver{
     private boolean started;
 
     private String peerInfo;
+
+    private SecretKey key;
+
     /**
      * BLEAdvertising class constructor
-     * @param Android context
+     * @param context Android context
      */
     private BLEAdvertising(Context context){
         Log.d(TAG,"New bleadvertising");
@@ -93,9 +99,21 @@ public class BLEAdvertising  implements AdvertisingDriver{
     }
 
     /**
+     * Set the notifier that receives the events advertised
+     * when creating or destroying the group or when receiving users connections
+     * @param key private encryption key
+     */
+    public void setKey(SecretKey key){
+        Log.d(TAG,"Trying to start");
+        this.key = key;
+    }
+
+
+    /**
      * This method configures AdvertiseSettings, starts advertising via BluetoothLeAdvertiser
      * and starts the GATT server
-     * @param serviceid service id
+     * @param serviceId service id
+     * @param peerInfo peer identifier
      */
     public void start(String serviceId, String peerInfo) {
         this.serviceId = serviceId;
@@ -138,6 +156,7 @@ public class BLEAdvertising  implements AdvertisingDriver{
      */
     private void startGATTServer(String serviceid){
         Log.d(TAG, "startGATTServer");
+
         serverCallback = new GattServerCallback(context, serviceid, advertisingInfo, new DiscoveryListener() {
             @Override
             public void sameStatusDiscovered(UUID characteristic) {
@@ -216,14 +235,24 @@ public class BLEAdvertising  implements AdvertisingDriver{
      * This method can be used to notify network information (SSID, password, node info) when detected different "topic" status
      * @param network SSID
      * @param password
-     * @param info  other network information
      */
     @Override
     public void notifyNetworkInformation(String network, String password){
 
         String msg = network+":"+password+":"+peerInfo;
-        for(UUID characteristic : pendingNotifications)
-            serverCallback.notifyCharacteristic(msg.getBytes(), characteristic);
+        if(key!=null) {
+            try {
+                byte[] encMsg = AESHelper.encrypt(msg.getBytes(),key);
+                for(UUID characteristic : pendingNotifications)
+                    serverCallback.notifyCharacteristic(encMsg, characteristic);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            for(UUID characteristic : pendingNotifications)
+                serverCallback.notifyCharacteristic(msg.getBytes(), characteristic);
+        }
+
     }
 
     /**

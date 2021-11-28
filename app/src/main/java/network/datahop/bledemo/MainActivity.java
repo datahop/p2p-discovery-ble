@@ -17,8 +17,17 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.Random;
 import java.util.UUID;
+
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
 
 import datahop.AdvertisementNotifier;
 import datahop.DiscoveryNotifier;
@@ -61,6 +70,26 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
         discoveryDriver = BLEServiceDiscovery.getInstance(getApplicationContext());
         advertisingDriver.setNotifier(this);
         discoveryDriver.setNotifier(this);
+
+        SecretKeyFactory factory = null;
+        try {
+            factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        char[] password = "password".toCharArray();
+
+        SecureRandom rand = new SecureRandom();
+        byte[] salt = new byte[32];
+        rand.nextBytes(salt);
+        KeySpec spec = new PBEKeySpec(password, salt, 65536, 256);
+        SecretKey tmp = null;
+        try {
+            tmp = factory.generateSecret(spec);
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
 
         peerId = (TextView) findViewById(R.id.textview_peerid);
 

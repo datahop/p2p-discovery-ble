@@ -33,6 +33,8 @@ import datahop.DiscoveryDriver;
 import static android.content.Context.BLUETOOTH_SERVICE;
 import static java.lang.Thread.sleep;
 
+import javax.crypto.SecretKey;
+
 /**
  * BLEServiceDiscovery class is used for service discovery using Bluetooth Low Energy (BLE) beacons.
  * BLEServiceDiscovery is responsible of scanning for BLE Beacons and starts a connection to the GATT server
@@ -79,9 +81,11 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 
 	private String peerInfo;
 
+	private SecretKey key;
+
 	/**
 	 * BLEServiceDiscovery class constructor
-	 * @param Android context
+	 * @param context Android context
 	 */
 	private BLEServiceDiscovery(Context context)
 	{
@@ -121,6 +125,19 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 		Log.d(TAG,"Trying to start");
 		this.notifier = notifier;
 	}
+
+
+
+	/**
+	 * Set the notifier that receives the events advertised
+	 * when creating or destroying the group or when receiving users connections
+	 * @param key private encryption key
+	 */
+	public void setKey(SecretKey key){
+		Log.d(TAG,"Trying to start");
+		this.key = key;
+	}
+
 
 	/**
 	 * This method starts the service and periodically scans for users and tries to connect to them
@@ -176,7 +193,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 	/**
 	 * This method adds advertising information value for the specified "topic". In case "topic"
 	 * already exists information is updated
-	 * @param topic topic id
+	 * @param characteristic topic id
 	 * @param info value advertised
 	 */
 	@Override
@@ -395,7 +412,9 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 				disconnect();
             tryConnection();
         }else {
-        	String msg = new String(messageBytes);
+			String msg;
+			if(key!=null) msg = decryption(messageBytes);
+			else msg =  new String(messageBytes);
 			Log.d(TAG, "Attempting to connect :"+msg);
 			String[] split = msg.split(":", 3);
         	if(split.length==3) {
@@ -521,6 +540,16 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 		}
 	};
 
+
+	private String decryption(byte[] cText){
+		String strDecryptedText="";
+		try {
+			strDecryptedText = AESHelper.decrypt(cText,key);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return strDecryptedText;
+	}
 
 	private class TryWriting implements Runnable {
 
