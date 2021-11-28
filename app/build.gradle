@@ -44,10 +44,13 @@ dependencies {
     implementation project(path: ':blediscovery')
     //implementation 'network.datahop.libs:blediscovery:0.0.1'
 
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    // Required for local unit tests (JUnit 4 framework)
+    testImplementation 'junit:junit:4.12'
 
-    implementation 'network.datahop.libs:datahop:v0.0.11'
+    // Required for instrumented tests
+    androidTestImplementation 'com.android.support:support-annotations:24.0.0'
+    androidTestImplementation 'com.android.support.test:runner:0.5'
+
+    implementation 'network.datahop.libs:datahop:v0.0.13'
 
 }

@@ -63,7 +63,7 @@ public class BLEAdvertising  implements AdvertisingDriver{
     private String peerInfo;
 
     private SecretKey key;
-
+    private byte[] salt;
     /**
      * BLEAdvertising class constructor
      * @param context Android context
@@ -103,9 +103,10 @@ public class BLEAdvertising  implements AdvertisingDriver{
      * when creating or destroying the group or when receiving users connections
      * @param key private encryption key
      */
-    public void setKey(SecretKey key){
+    public void setKey(SecretKey key,byte[] salt){
         Log.d(TAG,"Trying to start");
         this.key = key;
+        this.salt = salt;
     }
 
 
@@ -240,18 +241,18 @@ public class BLEAdvertising  implements AdvertisingDriver{
     public void notifyNetworkInformation(String network, String password){
 
         String msg = network+":"+password+":"+peerInfo;
-        if(key!=null) {
+        //if(key!=null) {
             try {
-                byte[] encMsg = AESHelper.encrypt(msg.getBytes(),key);
+                String encMsg = Encryption.encrypt(msg,"password");
                 for(UUID characteristic : pendingNotifications)
-                    serverCallback.notifyCharacteristic(encMsg, characteristic);
+                    serverCallback.notifyCharacteristic(encMsg.getBytes(), characteristic);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
+        /*} else {
             for(UUID characteristic : pendingNotifications)
                 serverCallback.notifyCharacteristic(msg.getBytes(), characteristic);
-        }
+        }*/
 
     }
 

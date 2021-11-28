@@ -413,8 +413,9 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
             tryConnection();
         }else {
 			String msg;
-			if(key!=null) msg = decryption(messageBytes);
-			else msg =  new String(messageBytes);
+			//if(key!=null) msg = decryption(messageBytes);
+			//else msg =  new String(messageBytes);
+			msg = Encryption.decrypt(new String(messageBytes),"password");
 			Log.d(TAG, "Attempting to connect :"+msg);
 			String[] split = msg.split(":", 3);
         	if(split.length==3) {
@@ -541,7 +542,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 	};
 
 
-	private String decryption(byte[] cText){
+	/*private String decryption(byte[] cText){
 		String strDecryptedText="";
 		try {
 			strDecryptedText = AESHelper.decrypt(cText,key);
@@ -549,7 +550,7 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 			e.printStackTrace();
 		}
 		return strDecryptedText;
-	}
+	}*/
 
 	private class TryWriting implements Runnable {
 
