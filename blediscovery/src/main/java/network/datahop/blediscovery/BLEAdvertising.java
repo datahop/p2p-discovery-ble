@@ -62,8 +62,9 @@ public class BLEAdvertising  implements AdvertisingDriver{
 
     private String peerInfo;
 
-    private SecretKey key;
-    private byte[] salt;
+    //private SecretKey key;
+    //private byte[] salt;
+    private String password;
     /**
      * BLEAdvertising class constructor
      * @param context Android context
@@ -94,7 +95,7 @@ public class BLEAdvertising  implements AdvertisingDriver{
      * @param notifier instance
      */
     public void setNotifier(AdvertisementNotifier notifier){
-        Log.d(TAG,"Trying to start");
+        //Log.d(TAG,"Trying to start");
         this.notifier = notifier;
     }
 
@@ -102,13 +103,20 @@ public class BLEAdvertising  implements AdvertisingDriver{
      * Set the notifier that receives the events advertised
      * when creating or destroying the group or when receiving users connections
      * @param key private encryption key
-     */
+
     public void setKey(SecretKey key,byte[] salt){
         Log.d(TAG,"Trying to start");
         this.key = key;
         this.salt = salt;
-    }
+    }*/
 
+    /**
+     * Set the encryption passphrase
+     * @param password passphrase used for encrypting
+     */
+    public void setPassword(String password){
+        this.password = password;
+    }
 
     /**
      * This method configures AdvertiseSettings, starts advertising via BluetoothLeAdvertiser
@@ -238,21 +246,21 @@ public class BLEAdvertising  implements AdvertisingDriver{
      * @param password
      */
     @Override
-    public void notifyNetworkInformation(String network, String password){
+    public void notifyNetworkInformation(String network, String pass){
 
-        String msg = network+":"+password+":"+peerInfo;
-        //if(key!=null) {
+        String msg = network+":"+pass+":"+peerInfo;
+        if(password!=null) {
             try {
-                String encMsg = Encryption.encrypt(msg,"password");
+                String encMsg = Encryption.encrypt(msg,password);
                 for(UUID characteristic : pendingNotifications)
                     serverCallback.notifyCharacteristic(encMsg.getBytes(), characteristic);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        /*} else {
+        } else {
             for(UUID characteristic : pendingNotifications)
                 serverCallback.notifyCharacteristic(msg.getBytes(), characteristic);
-        }*/
+        }
 
     }
 

@@ -81,7 +81,8 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 
 	private String peerInfo;
 
-	private SecretKey key;
+	private String password;
+	//private SecretKey key;
 
 	/**
 	 * BLEServiceDiscovery class constructor
@@ -132,12 +133,20 @@ public class BLEServiceDiscovery implements DiscoveryDriver{
 	 * Set the notifier that receives the events advertised
 	 * when creating or destroying the group or when receiving users connections
 	 * @param key private encryption key
-	 */
+	 /
 	public void setKey(SecretKey key){
 		Log.d(TAG,"Trying to start");
 		this.key = key;
-	}
+	}	 */
 
+	/**
+	 * Set the encryption passphrase
+	 * @param password passphrase used for encrypting
+	 */
+	public void setPassword(String password){
+	Log.d(TAG,"Trying to start");
+	this.password = password;
+	}
 
 	/**
 	 * This method starts the service and periodically scans for users and tries to connect to them

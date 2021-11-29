@@ -71,30 +71,9 @@ public class MainActivity extends AppCompatActivity implements AdvertisementNoti
         advertisingDriver.setNotifier(this);
         discoveryDriver.setNotifier(this);
 
-        /*SecretKeyFactory factory = null;
-        try {
-            factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        char[] password = "password".toCharArray();
+        advertisingDriver.setPassword("pass");
 
-        SecureRandom rand = new SecureRandom();
-        byte[] salt = new byte[32];
-        rand.nextBytes(salt);
-        KeySpec spec = new PBEKeySpec(password, salt, 65536, 128);
-        SecretKey tmp = null;
-        try {
-            tmp = factory.generateSecret(spec);
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
-        SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
-
-
-        advertisingDriver.setKey(secret);
-
-        discoveryDriver.setKey(secret);*/
+        discoveryDriver.setPassword("pass");
         peerId = (TextView) findViewById(R.id.textview_peerid);
 
         this.id = randomString();

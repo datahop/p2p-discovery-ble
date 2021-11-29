@@ -1,6 +1,6 @@
 package network.datahop.blediscovery;
 
-import android.util.Base64;
+import java.util.Base64;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
@@ -102,10 +102,13 @@ public class Encryption {
     }
 
     private static String toBase64(byte[] bytes) {
-        return Base64.encodeToString(bytes, Base64.NO_WRAP);
+        return Base64.getEncoder().encodeToString(bytes);
+        //return Base64.encodeToString(bytes, Base64.NO_WRAP);
     }
 
     private static byte[] fromBase64(String base64) {
-        return Base64.decode(base64, Base64.NO_WRAP);
+        return Base64.getDecoder().decode(base64);
+
+        //return Base64.decode(base64, Base64.NO_WRAP);
     }
 }
