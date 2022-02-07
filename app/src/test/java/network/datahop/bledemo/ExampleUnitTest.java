@@ -4,6 +4,18 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.InvalidParameterSpecException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+
 import network.datahop.blediscovery.Encryption;
 
 /**
@@ -21,12 +33,59 @@ public class ExampleUnitTest {
     @Test
     public void encrypt() {
         String plainMsg = "hola";
-        String encMsg = Encryption.encrypt(plainMsg,"password");
+
+
+        SecretKey enckey = null;
+        try {
+            enckey = Encryption.generateKey("password");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        byte[] encMsg = null;
+        try {
+            encMsg = Encryption.encryptMsg(plainMsg,enckey);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (InvalidParameterSpecException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         System.out.println("Plain message "+plainMsg);
 
-        System.out.println("Encrypted message "+encMsg);
+        System.out.println("Encrypted message "+new String(encMsg));
 
-        String decodedMsg = Encryption.decrypt(encMsg,"password");
+
+        String decodedMsg = null;
+        try {
+            decodedMsg = Encryption.decryptMsg(encMsg,enckey);
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (InvalidParameterSpecException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         System.out.println("Decoded message "+decodedMsg);
 
