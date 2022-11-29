@@ -3,13 +3,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 32
 
     defaultConfig {
         applicationId "network.datahop.bledemo"
         minSdkVersion 26
-        targetSdkVersion 30
+        targetSdkVersion 32
         versionCode 1
         versionName "1.0"
 
@@ -51,6 +50,7 @@ dependencies {
     androidTestImplementation 'com.android.support:support-annotations:24.0.0'
     androidTestImplementation 'com.android.support.test:runner:0.5'
 
-    implementation 'network.datahop.libs:datahop:v0.0.13'
+//    implementation 'network.datahop.libs:datahop:v0.0.13'
+    implementation(name: 'datahop', ext: 'aar')
 
 }
